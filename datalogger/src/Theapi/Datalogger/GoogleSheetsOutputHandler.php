@@ -5,8 +5,6 @@ use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
 
 define('APPLICATION_NAME', 'Google Sheets API');
-define('CREDENTIALS_PATH', '.credentials/sheets.googleapis.com-php-bathroom_scales.json');
-define('CLIENT_SECRET_PATH', '.credentials/bathroom_scales_client_secret.json');
 // If modifying these scopes, delete the previously saved credentials
 // at ~/.credentials/sheets.googleapis.com-php-bathroom_scales.json
 define('SCOPES', implode(' ', array(
@@ -17,12 +15,18 @@ define('SCOPES', implode(' ', array(
 class GoogleSheetsOutputHandler implements OutputHandlerInterface {
 
   /**
-   * @var string
+   * @var Config
    */
-  private $spreadsheetId;
+  private $config;
 
-  public function __construct($spreadsheet_id) {
-    $this->spreadsheetId = $spreadsheet_id;
+  /**
+   * @var PeopleInterface
+   */
+  private $people;
+
+  public function __construct($config, PeopleInterface $people) {
+    $this->config = $config;
+    $this->people = $people;
   }
 
   /**
@@ -33,26 +37,26 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
     $google_client = $this->getClient();
     $google_service = new Google_Service_Sheets($google_client);
 
-    $this->updateSheet($google_service, $this->spreadsheetId, $data);
+    $this->updateSheet($google_service, $this->config->getValue('spreadsheet_id'), $data);
   }
 
   /**
    * Add data to the Google spreadsheet.
    *
    * @param Google_Service_Sheets $google_service
-   * @param string $spreadsheetId
+   * @param string $spreadsheet_id
    * @param array $row_data
    *
    */
-  public function updateSheet($google_service, $spreadsheetId, $row_data) {
-    $range = 'Peter!A1:B';
+  public function updateSheet($google_service, $spreadsheet_id, $row_data) {
+    $range = $this->people->getPersonByWeight($row_data['weight']) . '!A1:B';
     $requestBody = new Google_Service_Sheets_ValueRange();
     $requestBody->setValues(array(array_values($row_data)));
     $optParams['insertDataOption'] = 'INSERT_ROWS';
     $optParams['valueInputOption'] = 'RAW';
     try {
       $response = $google_service->spreadsheets_values->append(
-        $spreadsheetId,
+        $spreadsheet_id,
         $range,
         $requestBody,
         $optParams
@@ -70,11 +74,11 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
     $client = new \Google_Client();
     $client->setApplicationName(APPLICATION_NAME);
     $client->setScopes(SCOPES);
-    $client->setAuthConfig(CLIENT_SECRET_PATH);
+    $client->setAuthConfig($this->config->getValue('CLIENT_SECRET_PATH'));
     $client->setAccessType('offline');
 
     // Load previously authorized credentials from a file.
-    $credentialsPath = $this->expandHomeDirectory(CREDENTIALS_PATH);
+    $credentialsPath = $this->config->getValue('CREDENTIALS_PATH');
     if (file_exists($credentialsPath)) {
       $accessToken = json_decode(file_get_contents($credentialsPath), true);
     } else {
@@ -102,19 +106,6 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
       file_put_contents($credentialsPath, json_encode($client->getAccessToken()));
     }
     return $client;
-  }
-
-  /**
-   * Expands the home directory alias '~' to the full path.
-   * @param string $path the path to expand.
-   * @return string the expanded path.
-   */
-  public function expandHomeDirectory($path) {
-    $homeDirectory = getenv('HOME');
-    if (empty($homeDirectory)) {
-      $homeDirectory = getenv('HOMEDRIVE') . getenv('HOMEPATH');
-    }
-    return str_replace('~', realpath($homeDirectory), $path);
   }
 
 }

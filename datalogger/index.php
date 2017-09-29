@@ -17,9 +17,19 @@ spl_autoload_register(function ($class) {
   }
 });
 
+// Configuration for Google sheets.
+$config = new Theapi\Datalogger\Config();
+$config->setValue('spreadsheet_id', SPREADSHEET_ID)
+  ->setValue('people', PEOPLE)
+  ->setValue('CREDENTIALS_PATH', __DIR__ . '/' . CREDENTIALS_PATH)
+  ->setValue('CLIENT_SECRET_PATH',  __DIR__ . '/' . CLIENT_SECRET_PATH);
 
+$people = new Theapi\Datalogger\People($config);
 $data_processor = new Theapi\Datalogger\DataProcessor();
 $data_processor->process(
   new Theapi\Datalogger\HttpInputHandler(),
-  new Theapi\Datalogger\GoogleSheetsOutputHandler($spreadsheetId)
+  new Theapi\Datalogger\GoogleSheetsOutputHandler(
+    $config,
+    new Theapi\Datalogger\People($config)
+  )
 );

@@ -22,15 +22,22 @@ if (php_sapi_name() != 'cli') {
   throw new Exception('This application must be run on the command line.');
 }
 
-$sheets = new Theapi\Datalogger\GoogleSheetsOutputHandler($spreadsheetId);
+$config = new Theapi\Datalogger\Config();
+$config->setValue('spreadsheet_id', SPREADSHEET_ID)
+  ->setValue('people', PEOPLE)
+  ->setValue('CREDENTIALS_PATH', __DIR__ . '/' . CREDENTIALS_PATH)
+  ->setValue('CLIENT_SECRET_PATH',  __DIR__ . '/' . CLIENT_SECRET_PATH);
+
+$people = new Theapi\Datalogger\People($config);
+$sheets = new Theapi\Datalogger\GoogleSheetsOutputHandler($config, $people);
 
 // Get the API client and construct the service object.
 $client = $sheets->getClient();
 $service = new Google_Service_Sheets($client);
 
 // Check authentication
-$range = 'Peter!A1:B';
-$response = $service->spreadsheets_values->get($spreadsheetId, $range);
+$range = $people->getPersonByWeight('90') . '!A1:B';
+$response = $service->spreadsheets_values->get($config->getValue('spreadsheet_id'), $range);
 $values = $response->getValues();
 print_r($values);
 
