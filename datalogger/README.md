@@ -1,2 +1,2 @@
 Install using composer:
-`composer.phar install --optimize-autoloader`
+`composer install --optimize-autoloader`
