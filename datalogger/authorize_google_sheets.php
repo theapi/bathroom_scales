@@ -9,7 +9,7 @@ use Theapi\Datalogger\GoogleSheetsOutputHandler;
 use Theapi\Datalogger\People;
 
 require_once __DIR__ . '/vendor/autoload.php';
-require_once 'config.php';
+require_once 'settings.php';
 
 if (php_sapi_name() != 'cli') {
   throw new Exception('This application must be run on the command line.');
