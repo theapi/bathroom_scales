@@ -1,2 +1,9 @@
+config.h
+config.php
+.idea
 .DS_Store
+
+vendor
+composer.lock
+.credentials
 
