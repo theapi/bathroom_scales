@@ -2,7 +2,8 @@
 /**
  * See https://developers.google.com/sheets/api/quickstart/php
  *
- * Download credentials from https://console.developers.google.com/apis/credentials?project=bathroom-scales
+ * Download credentials from
+ * https://console.developers.google.com/apis/credentials?project=bathroom-scales
  */
 
 use Theapi\Datalogger\GoogleSheetsOutputHandler;
@@ -18,8 +19,8 @@ if (php_sapi_name() != 'cli') {
 $config = new Theapi\Datalogger\Config();
 $config->setValue('spreadsheet_id', SPREADSHEET_ID)
   ->setValue('people', PEOPLE)
-  ->setValue('CREDENTIALS_PATH', __DIR__ . '/' . CREDENTIALS_PATH)
-  ->setValue('CLIENT_SECRET_PATH',  __DIR__ . '/' . CLIENT_SECRET_PATH);
+  ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
+  ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
 $people = new People($config);
 $sheets = new GoogleSheetsOutputHandler($config, $people);

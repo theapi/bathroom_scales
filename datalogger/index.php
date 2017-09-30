@@ -18,8 +18,8 @@ require_once 'settings.php';
 $config = new Theapi\Datalogger\Config();
 $config->setValue('spreadsheet_id', SPREADSHEET_ID)
   ->setValue('people', PEOPLE)
-  ->setValue('CREDENTIALS_PATH', __DIR__ . '/' . CREDENTIALS_PATH)
-  ->setValue('CLIENT_SECRET_PATH',  __DIR__ . '/' . CLIENT_SECRET_PATH);
+  ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
+  ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
 $people = new People($config);
 $data_processor = new DataProcessor();
