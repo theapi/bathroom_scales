@@ -36,7 +36,6 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
     // Get the Google API client and construct the service object.
     $google_client = $this->getClient();
     $google_service = new Google_Service_Sheets($google_client);
-
     $this->updateSheet($google_service, $this->config->getValue('spreadsheet_id'), $data);
   }
 
@@ -51,7 +50,7 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
   public function updateSheet($google_service, $spreadsheet_id, $row_data) {
     $range = $this->people->getPersonByWeight($row_data['weight']) . '!A1:B';
     $requestBody = new Google_Service_Sheets_ValueRange();
-    $requestBody->setValues(array(array_values($row_data)));
+    $requestBody->setValues([[$row_data['timestamp'], $row_data['weight']]]);
     $optParams['insertDataOption'] = 'INSERT_ROWS';
     $optParams['valueInputOption'] = 'RAW';
     try {
