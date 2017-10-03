@@ -30,6 +30,9 @@ class CliInputHandler implements InputHandlerInterface {
    */
   public function getInput() {
     $options = getopt("w:");
+    if (!isset($options['w'])) {
+      throw new \InvalidArgumentException('Weight value missing, eg -w=90');
+    }
     $this->weight = $options['w'];
 
     $this->verify();
