@@ -16,6 +16,8 @@
 
 WiFiMulti wifiMulti;
 
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in seconds) */
 
 
 void setup() {
@@ -27,13 +29,41 @@ void setup() {
     USE_SERIAL.println();
     USE_SERIAL.println();
     USE_SERIAL.println();
-
-
+    
     wifiMulti.addAP("SSID", "PASSWORD");
+
+    // Perform everything needed while awake.
+    awake();
+
+    // Get ready to sleep
+    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+
+    // Now sleep
+    Serial.println("Going to sleep now");
+    esp_deep_sleep_start();
 
 }
 
 void loop() {
+  // This is not going to be called
+}
+
+void awake() {
+
+    esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason) {
+    case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case 3  : Serial.println("Wakeup caused by timer"); break;
+    case 4  : Serial.println("Wakeup caused by touchpad"); break;
+    case 5  : Serial.println("Wakeup caused by ULP program"); break;
+    default : Serial.println("Wakeup was not caused by deep sleep"); break;
+  }
+  
     // wait for WiFi connection
     if((wifiMulti.run() == WL_CONNECTED)) {
 
@@ -63,6 +93,5 @@ void loop() {
         http.end();
     }
 
-    delay(5000);
 }
 
