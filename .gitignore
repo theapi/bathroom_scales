@@ -1,5 +1,7 @@
 config.h
+credentials.h
 settings.php
+
 .idea
 .DS_Store
 
