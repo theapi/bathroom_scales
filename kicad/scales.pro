@@ -1,4 +1,4 @@
-update=Thursday, 05 October 2017 'pmt' 13:53:35
+update=Friday, 06 October 2017 'amt' 11:07:26
 version=1
 last_client=kicad
 [pcbnew]
@@ -59,3 +59,4 @@ LibName27=atmel
 LibName28=contrib
 LibName29=valves
 LibName30=switches
+LibName31=ESP32-Footprints/ESP32-footprints-Shem-Lib
