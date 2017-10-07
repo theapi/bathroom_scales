@@ -10,9 +10,9 @@ interface InputHandlerInterface {
   public function verify();
 
   /**
-   * The verified input;
-   * @return array
+   * The verified data;
+   * @return DataRowInterface
    */
-  public function getInput();
+  public function getDataRow();
 
 }

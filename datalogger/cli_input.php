@@ -24,11 +24,8 @@ $config->setValue('spreadsheet_id', SPREADSHEET_ID)
 $people = new People($config);
 $data_processor = new DataProcessor();
 $data_processor
-    ->addInputHandler(new CliInputHandler())
-    ->addOutputHandler(new GoogleSheetsOutputHandler(
-        $config,
-        new People($config)
-    ));
+    ->addInputHandler(new CliInputHandler($people))
+    ->addOutputHandler(new GoogleSheetsOutputHandler($config));
 
 try {
   $data_processor->run();

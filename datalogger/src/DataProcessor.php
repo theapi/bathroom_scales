@@ -50,7 +50,7 @@ class DataProcessor implements DataProcessorInterface {
         $outputs = $this->getOutputHandlers();
         foreach($inputs as $input) {
             foreach ($outputs as $output) {
-                $output->write($input->getInput());
+                $output->write($input->getDataRow());
             }
         }
     }

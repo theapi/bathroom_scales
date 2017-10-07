@@ -11,7 +11,11 @@ define('SCOPES', implode(' ', array(
     Google_Service_Sheets::SPREADSHEETS)
 ));
 
-
+/**
+ * Class GoogleSheetsOutputHandler
+ *
+ * @package Theapi\Datalogger
+ */
 class GoogleSheetsOutputHandler implements OutputHandlerInterface {
 
   /**
@@ -20,19 +24,18 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
   private $config;
 
   /**
-   * @var PeopleInterface
+   * GoogleSheetsOutputHandler constructor.
+   *
+   * @param $config
    */
-  private $people;
-
-  public function __construct($config, PeopleInterface $people) {
+  public function __construct($config) {
     $this->config = $config;
-    $this->people = $people;
   }
 
   /**
    * @inheritdoc
    */
-  public function write($data) {
+  public function write(DataRowInterface $data) {
     // Get the Google API client and construct the service object.
     $google_client = $this->getClient();
     $google_service = new Google_Service_Sheets($google_client);
@@ -44,13 +47,15 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
    *
    * @param Google_Service_Sheets $google_service
    * @param string $spreadsheet_id
-   * @param array $row_data
+   * @param DataRowInterface $row_data
    *
    */
-  public function updateSheet($google_service, $spreadsheet_id, $row_data) {
-    $range = $this->people->getPersonByWeight($row_data['weight']) . '!A1:B';
+  public function updateSheet($google_service, $spreadsheet_id, DataRowInterface $row_data) {
+    $range = $row_data->getValue('person') . '!A1:B';
     $requestBody = new Google_Service_Sheets_ValueRange();
-    $requestBody->setValues([[$row_data['timestamp'], $row_data['weight']]]);
+    $requestBody->setValues([
+      [$row_data->getValue('timestamp'), $row_data->getValue('weight')]
+    ]);
     $optParams['insertDataOption'] = 'INSERT_ROWS';
     $optParams['valueInputOption'] = 'RAW';
     try {

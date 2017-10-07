@@ -3,7 +3,7 @@
 namespace Theapi\Datalogger;
 
 
-class Data implements DataInterface {
+class DataRow implements DataRowInterface {
 
   private $data = array();
 
@@ -21,7 +21,7 @@ class Data implements DataInterface {
    */
   public function getValue($key) {
     if (!isset($this->data[$key])) {
-      throw new \InvalidArgumentException("Data value: $key is not set");
+      throw new \InvalidArgumentException("DataRow value: $key is not set");
     }
 
     return $this->data[$key];

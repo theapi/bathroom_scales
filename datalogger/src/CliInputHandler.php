@@ -2,8 +2,28 @@
 
 namespace Theapi\Datalogger;
 
-
+/**
+ * Class CliInputHandler
+ *
+ * @package Theapi\Datalogger
+ */
 class CliInputHandler implements InputHandlerInterface {
+
+  protected $weight;
+
+  /**
+   * @var PeopleInterface
+   */
+  private $people;
+
+  /**
+   * CsvIputHandler constructor.
+   *
+   * @param \Theapi\Datalogger\PeopleInterface $people
+   */
+  public function __construct(PeopleInterface $people) {
+    $this->people = $people;
+  }
 
   /**
    * @inheritdoc
@@ -28,7 +48,7 @@ class CliInputHandler implements InputHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function getInput() {
+  public function getDataRow() {
     $options = getopt("w:");
     if (!isset($options['w'])) {
       throw new \InvalidArgumentException('Weight value missing, eg -w=90');
@@ -39,10 +59,10 @@ class CliInputHandler implements InputHandlerInterface {
 
     echo "OK\n";
 
-    return [
-      'weight' => (int) $this->weight,
-      'timestamp' => date('c'),
-    ];
+    return (new DataRow())
+      ->setValue('person', $this->people->getPersonByWeight($this->weight))
+      ->setValue('weight', $this->weight)
+      ->setValue('timestamp', date('c'));
   }
 
 }

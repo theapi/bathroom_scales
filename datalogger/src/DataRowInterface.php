@@ -1,7 +1,7 @@
 <?php
 namespace Theapi\Datalogger;
 
-interface DataInterface {
+interface DataRowInterface {
 
   /**
    * Set a value.

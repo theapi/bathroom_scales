@@ -2,8 +2,26 @@
 
 namespace Theapi\Datalogger;
 
-
+/**
+ * Class HttpInputHandler
+ *
+ * @package Theapi\Datalogger
+ */
 class HttpInputHandler implements InputHandlerInterface {
+
+  /**
+   * @var PeopleInterface
+   */
+  private $people;
+
+  /**
+   * CsvIputHandler constructor.
+   *
+   * @param \Theapi\Datalogger\PeopleInterface $people
+   */
+  public function __construct(PeopleInterface $people) {
+    $this->people = $people;
+  }
 
   /**
    * @inheritdoc
@@ -27,7 +45,7 @@ class HttpInputHandler implements InputHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function getInput() {
+  public function getDataRow() {
     $this->verify();
 
     // Tell the client immediately that the message was received.
@@ -53,10 +71,11 @@ class HttpInputHandler implements InputHandlerInterface {
     ob_flush();
     flush();
 
-    return [
-      'weight' => (int) $_GET['w'],
-      'timestamp' => date('c'),
-    ];
+    $weight = (int) $_GET['w'];
+    return (new DataRow())
+      ->setValue('person', $this->people->getPersonByWeight($weight))
+      ->setValue('weight', $weight)
+      ->setValue('timestamp', date('c'));
   }
 
 }

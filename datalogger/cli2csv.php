@@ -20,11 +20,8 @@ $config->setValue('people', PEOPLE)
 $people = new People($config);
 $data_processor = new DataProcessor();
 $data_processor
-    ->addInputHandler(new CliInputHandler())
-    ->addOutputHandler(new CsvOutputHandler(
-        $config,
-        new People($config)
-    ));
+    ->addInputHandler(new CliInputHandler($people))
+    ->addOutputHandler(new CsvOutputHandler($config));
 
 try {
   $data_processor->run();

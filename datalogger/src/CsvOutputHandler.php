@@ -2,7 +2,11 @@
 namespace Theapi\Datalogger;
 
 
-
+/**
+ * Class CsvOutputHandler
+ *
+ * @package Theapi\Datalogger
+ */
 class CsvOutputHandler implements OutputHandlerInterface {
 
   /**
@@ -11,25 +15,24 @@ class CsvOutputHandler implements OutputHandlerInterface {
   private $config;
 
   /**
-   * @var PeopleInterface
+   * CsvOutputHandler constructor.
+   *
+   * @param $config
    */
-  private $people;
-
-  public function __construct($config, PeopleInterface $people) {
+  public function __construct($config) {
     $this->config = $config;
-    $this->people = $people;
   }
 
   /**
    * @inheritdoc
    */
-  public function write($data) {
+  public function write(DataRowInterface $data) {
     $csv_file = $this->config->getValue('CSV_FILE');
-    $row = $this->people->getPersonByWeight($data['weight'])
+    $row = $data->getValue('person')
       . ','
-      . $data['timestamp']
+      . $data->getValue('timestamp')
       . ','
-      . $data['weight']
+      . $data->getValue('weight')
       . "\n";
     file_put_contents($csv_file, $row, FILE_APPEND);
   }
