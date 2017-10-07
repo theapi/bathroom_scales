@@ -28,11 +28,13 @@ class CsvOutputHandler implements OutputHandlerInterface {
    */
   public function write(DataRowInterface $data) {
     $csv_file = $this->config->getValue('CSV_FILE');
-    $row = $data->getValue('person')
+    $row = $data->person()
       . ','
-      . $data->getValue('timestamp')
+      . $data->timestamp()
       . ','
-      . $data->getValue('weight')
+      . $data->weight()
+      . ','
+      . $data->battery()
       . "\n";
     file_put_contents($csv_file, $row, FILE_APPEND);
   }

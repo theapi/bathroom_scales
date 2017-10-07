@@ -31,6 +31,10 @@ class HttpInputHandler implements InputHandlerInterface {
       throw new \InvalidArgumentException('Weight value missing');
     }
 
+    if (!isset($_GET['b'])) {
+      throw new \InvalidArgumentException('Battery voltage value missing');
+    }
+
     $filter_options = array(
       'options' => array(
         'min_range' => 0,
@@ -39,6 +43,9 @@ class HttpInputHandler implements InputHandlerInterface {
     );
     if (filter_var($_GET['w'], FILTER_VALIDATE_INT, $filter_options) === FALSE) {
       throw new \InvalidArgumentException('Invalid weight');
+    }
+    if (filter_var($_GET['b'], FILTER_VALIDATE_INT) === FALSE) {
+      throw new \InvalidArgumentException('Invalid battery voltage');
     }
   }
 
@@ -73,9 +80,10 @@ class HttpInputHandler implements InputHandlerInterface {
 
     $weight = (int) $_GET['w'];
     return (new DataRow())
-      ->setValue('person', $this->people->getPersonByWeight($weight))
-      ->setValue('weight', $weight)
-      ->setValue('timestamp', date('c'));
+      ->setPerson($this->people->getPersonByWeight($weight))
+      ->setWeight($weight)
+      ->setBattery((int) $_GET['b'])
+      ->setTimestamp();
   }
 
 }

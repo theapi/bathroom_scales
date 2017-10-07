@@ -51,10 +51,14 @@ class GoogleSheetsOutputHandler implements OutputHandlerInterface {
    *
    */
   public function updateSheet($google_service, $spreadsheet_id, DataRowInterface $row_data) {
-    $range = $row_data->getValue('person') . '!A1:B';
+    $range = $row_data->person() . '!A1:C';
     $requestBody = new Google_Service_Sheets_ValueRange();
     $requestBody->setValues([
-      [$row_data->getValue('timestamp'), $row_data->getValue('weight')]
+      [
+        $row_data->timestamp(),
+        $row_data->weight(),
+        $row_data->battery(),
+      ]
     ]);
     $optParams['insertDataOption'] = 'INSERT_ROWS';
     $optParams['valueInputOption'] = 'RAW';

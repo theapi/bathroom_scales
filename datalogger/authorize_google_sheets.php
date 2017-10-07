@@ -30,7 +30,7 @@ $client = $sheets->getClient();
 $service = new Google_Service_Sheets($client);
 
 // Check authentication
-$range = $people->getPersonByWeight('90') . '!A1:B';
+$range = $people->getPersonByWeight('90') . '!A1:C';
 $response = $service->spreadsheets_values->get($config->getValue('spreadsheet_id'), $range);
 $values = $response->getValues();
 print_r($values);

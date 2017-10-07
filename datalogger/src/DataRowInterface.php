@@ -4,22 +4,55 @@ namespace Theapi\Datalogger;
 interface DataRowInterface {
 
   /**
-   * Set a value.
-   * @param string $key
+   * @param $value
    *
    * @return self
    */
-  public function setValue($key, $value);
+  public function setBattery($value);
 
   /**
-   * Get a value.
+   * @param $value
    *
+   * @return self
+   */
+  public function setPerson($value);
+
+  /**
+   * Set the timestamp to now.
+   *
+   * @return self
+   */
+  public function setTimestamp();
+
+  /**
+   * @param $value
+   *
+   * @return self
+   */
+  public function setWeight($value);
+
+  /**
+   * The Voltage on the battery.
+   * @return int
+   */
+  public function battery();
+
+  /**
+   * The name of the person.
    * @return string
    */
-  public function getValue($key);
+  public function person();
 
-  public function toCSV();
+  /**
+   * The date time in ISO 8601 format.
+   * @return string
+   */
+  public function timestamp();
 
-  public function toString();
+  /**
+   * The weight in Kg.
+   * @return float
+   */
+  public function weight();
 
 }

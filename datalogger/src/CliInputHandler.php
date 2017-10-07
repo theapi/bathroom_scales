@@ -11,6 +11,8 @@ class CliInputHandler implements InputHandlerInterface {
 
   protected $weight;
 
+  protected $battery;
+
   /**
    * @var PeopleInterface
    */
@@ -30,10 +32,6 @@ class CliInputHandler implements InputHandlerInterface {
    */
   public function verify() {
 
-    if (!isset($this->weight)) {
-      throw new \InvalidArgumentException('Weight value missing');
-    }
-
     $filter_options = array(
       'options' => array(
         'min_range' => 0,
@@ -43,26 +41,35 @@ class CliInputHandler implements InputHandlerInterface {
     if (filter_var($this->weight, FILTER_VALIDATE_INT, $filter_options) === FALSE) {
       throw new \InvalidArgumentException('Invalid weight');
     }
+    if (filter_var($this->battery, FILTER_VALIDATE_INT) === FALSE) {
+      throw new \InvalidArgumentException('Invalid battery voltage');
+    }
   }
 
   /**
    * @inheritdoc
    */
   public function getDataRow() {
-    $options = getopt("w:");
+    $options = getopt("w:b:");
     if (!isset($options['w'])) {
       throw new \InvalidArgumentException('Weight value missing, eg -w=90');
     }
     $this->weight = $options['w'];
+
+    if (!isset($options['b'])) {
+      throw new \InvalidArgumentException('Battery voltage value missing, eg -b=3700');
+    }
+    $this->battery = $options['b'];
 
     $this->verify();
 
     echo "OK\n";
 
     return (new DataRow())
-      ->setValue('person', $this->people->getPersonByWeight($this->weight))
-      ->setValue('weight', $this->weight)
-      ->setValue('timestamp', date('c'));
+      ->setPerson($this->people->getPersonByWeight($this->weight))
+      ->setWeight($this->weight)
+      ->setBattery($this->battery)
+      ->setTimestamp();
   }
 
 }

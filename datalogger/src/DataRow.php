@@ -10,7 +10,7 @@ class DataRow implements DataRowInterface {
   /**
    * @inheritDoc
    */
-  public function setValue($key, $value) {
+  protected function setValue($key, $value) {
     $this->data[$key] = $value;
 
     return $this;
@@ -19,7 +19,7 @@ class DataRow implements DataRowInterface {
   /**
    * @inheritDoc
    */
-  public function getValue($key) {
+  protected function getValue($key) {
     if (!isset($this->data[$key])) {
       throw new \InvalidArgumentException("DataRow value: $key is not set");
     }
@@ -30,15 +30,57 @@ class DataRow implements DataRowInterface {
   /**
    * @inheritDoc
    */
-  public function toCSV() {
-    // TODO: Implement toCSV() method.
+  public function setBattery($value) {
+    return $this->setValue('battery', $value);
   }
 
   /**
    * @inheritDoc
    */
-  public function toString() {
-    // TODO: Implement toString() method.
+  public function setPerson($value) {
+    return $this->setValue('person', $value);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function setWeight($value) {
+    return $this->setValue('weight', $value);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setTimestamp() {
+  	return $this->setValue('timestamp', date('c'));
+  }
+  
+  /**
+   * @inheritDoc
+   */
+  public function battery() {
+    return $this->getValue('battery');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function person() {
+    return $this->getValue('person');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function weight() {
+    return $this->getValue('weight');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function timestamp() {
+  	return $this->getValue('timestamp');
+  }
+  
 }
