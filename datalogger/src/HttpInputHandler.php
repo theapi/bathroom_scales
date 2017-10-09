@@ -15,45 +15,45 @@ class HttpInputHandler implements InputHandlerInterface {
   private $people;
 
   /**
+   * @var InputValidatorInterface
+   */
+  private $verification;
+
+  /**
    * CsvIputHandler constructor.
    *
    * @param \Theapi\Datalogger\PeopleInterface $people
    */
-  public function __construct(PeopleInterface $people) {
+  public function __construct(PeopleInterface $people, InputValidatorInterface $verification) {
     $this->people = $people;
+    $this->verification = $verification;
   }
 
   /**
    * @inheritdoc
    */
-  public function verify() {
-    if (!isset($_GET['w'])) {
-      throw new \InvalidArgumentException('Weight value missing');
-    }
-
-    if (!isset($_GET['b'])) {
-      throw new \InvalidArgumentException('Battery voltage value missing');
-    }
-
-    $filter_options = array(
-      'options' => array(
-        'min_range' => 0,
-        'max_range' => 150,
-      )
-    );
-    if (filter_var($_GET['w'], FILTER_VALIDATE_INT, $filter_options) === FALSE) {
-      throw new \InvalidArgumentException('Invalid weight');
-    }
-    if (filter_var($_GET['b'], FILTER_VALIDATE_INT) === FALSE) {
-      throw new \InvalidArgumentException('Invalid battery voltage');
-    }
+  public function getVerification() {
+    return $this->verification;
   }
 
   /**
    * @inheritdoc
    */
   public function getDataRow() {
-    $this->verify();
+    if (!isset($_GET['w'])) {
+      throw new \InvalidArgumentException('Weight value missing');
+    }
+    $weight = (int) $_GET['w'];
+
+    if (!isset($_GET['b'])) {
+      throw new \InvalidArgumentException('Battery voltage value missing');
+    }
+    $battery = (int) $_GET['b'];
+
+    $this->getVerification()->getArgument('Weight')->setValue($weight);
+    $this->getVerification()->getArgument('Battery')->setValue($battery);
+
+    $this->getVerification()->verify();
 
     // Tell the client immediately that the message was received.
     ob_start();
@@ -78,11 +78,10 @@ class HttpInputHandler implements InputHandlerInterface {
     ob_flush();
     flush();
 
-    $weight = (int) $_GET['w'];
     return (new DataRow())
       ->setPerson($this->people->getPersonByWeight($weight))
       ->setWeight($weight)
-      ->setBattery((int) $_GET['b'])
+      ->setBattery($battery)
       ->setTimestamp();
   }
 

@@ -4,10 +4,9 @@ namespace Theapi\Datalogger;
 interface InputHandlerInterface {
 
   /**
-   * Verifies the input arguments are valid.
-   * @throws /InvalidArgumentException
+   * @return InputValidatorInterface
    */
-  public function verify();
+  public function getVerification();
 
   /**
    * The verified data;

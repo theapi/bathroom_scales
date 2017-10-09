@@ -9,6 +9,9 @@ use Theapi\Datalogger\DataProcessor;
 use Theapi\Datalogger\GoogleSheetsOutputHandler;
 use Theapi\Datalogger\HttpInputHandler;
 use Theapi\Datalogger\People;
+use Theapi\Datalogger\InputValidator;
+use Theapi\Datalogger\WeightInputArgument;
+use Theapi\Datalogger\BatteryInputArgument;
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'settings.php';
@@ -21,10 +24,13 @@ $config->setValue('spreadsheet_id', SPREADSHEET_ID)
   ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
   ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
+$validator = new InputValidator();
+$validator->addArgument(new WeightInputArgument());
+$validator->addArgument(new BatteryInputArgument());
 $people = new People($config);
 $data_processor = new DataProcessor();
 $data_processor
-    ->addInputHandler(new HttpInputHandler($people))
+    ->addInputHandler(new HttpInputHandler($people, $validator))
     ->addOutputHandler(new GoogleSheetsOutputHandler($config));
 
 $data_processor->run();
