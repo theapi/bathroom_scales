@@ -408,13 +408,13 @@ F 3 "" H 9150 3475 50  0000 C CNN
 $EndComp
 Wire Wire Line
 	9150 3375 9150 3475
-Text GLabel 7300 3125 0    60   Input ~ 0
+Text GLabel 7300 2725 0    60   Input ~ 0
 BATT
 Text GLabel 8300 3875 3    60   Input ~ 0
 WCLK
 Text GLabel 8400 3875 3    60   Input ~ 0
 WDATA
-Text GLabel 7300 2725 0    60   Input ~ 0
+Text GLabel 7300 3125 0    60   Input ~ 0
 WAKE
 NoConn ~ 7300 2425
 NoConn ~ 7300 2525
