@@ -50,8 +50,10 @@ class HttpInputHandler implements InputHandlerInterface {
 
     if (!isset($msg)) {
       $msg = 'OK';
-      $this->getValidator()->getArgument('Weight')->setValue((int) $_GET['w']);
-      $this->getValidator()->getArgument('Battery')->setValue((int) $_GET['b']);
+      $weight = (int) $_GET['w'];
+      $battery = (int) $_GET['b'];
+      $this->getValidator()->getArgument('Weight')->setValue($weight);
+      $this->getValidator()->getArgument('Battery')->setValue($battery);
       try {
         $this->getValidator()->validate();
       } catch (\InvalidArgumentException $e) {
