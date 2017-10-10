@@ -20,14 +20,13 @@ require_once 'settings.php';
 // Configuration for Google sheets.
 $config = new Theapi\Datalogger\Config();
 $config->setValue('spreadsheet_id', SPREADSHEET_ID)
-  ->setValue('people', PEOPLE)
   ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
   ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
 $validator = new InputValidator();
 $validator->addArgument(new WeightInputArgument());
 $validator->addArgument(new BatteryInputArgument());
-$people = new People($config);
+$people = new People(PEOPLE);
 $data_processor = new DataProcessor();
 $data_processor
     ->addInputHandler(new HttpInputHandler($people, $validator))

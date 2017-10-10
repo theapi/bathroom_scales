@@ -10,24 +10,23 @@ namespace Theapi\Datalogger;
 class CsvOutputHandler implements OutputHandlerInterface {
 
   /**
-   * @var Config
+   * @var string The location of the csv file.
    */
-  private $config;
+  private $csv;
 
   /**
    * CsvOutputHandler constructor.
    *
    * @param $config
    */
-  public function __construct($config) {
-    $this->config = $config;
+  public function __construct($csv_file) {
+    $this->csv = $csv_file;
   }
 
   /**
    * @inheritdoc
    */
   public function write(DataRowInterface $data) {
-    $csv_file = $this->config->getValue('CSV_FILE');
     $row = $data->person()
       . ','
       . $data->timestamp()
@@ -36,7 +35,7 @@ class CsvOutputHandler implements OutputHandlerInterface {
       . ','
       . $data->battery()
       . "\n";
-    file_put_contents($csv_file, $row, FILE_APPEND);
+    file_put_contents($this->csv, $row, FILE_APPEND);
   }
 
 }

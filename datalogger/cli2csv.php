@@ -15,19 +15,14 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once 'settings.php';
 
 
-// Configuration.
-$config = new Theapi\Datalogger\Config();
-$config->setValue('people', PEOPLE)
-  ->setValue('CSV_FILE', CSV_FILE);
-
 $validator = new InputValidator();
 $validator->addArgument(new WeightInputArgument());
 $validator->addArgument(new BatteryInputArgument());
-$people = new People($config);
+$people = new People(PEOPLE);
 $data_processor = new DataProcessor();
 $data_processor
     ->addInputHandler(new CliInputHandler($people, $validator))
-    ->addOutputHandler(new CsvOutputHandler($config));
+    ->addOutputHandler(new CsvOutputHandler(CSV_FILE));
 
 try {
   $data_processor->run();

@@ -5,16 +5,10 @@ namespace Theapi\Datalogger;
 
 class People implements PeopleInterface {
 
-  /**
-   * @var Config
-   */
-  private $config;
-
   private $data;
 
-  public function __construct(Config $config) {
-    $this->config = $config;
-    $this->data = json_decode($config->getValue('people'));
+  public function __construct($json) {
+    $this->data = json_decode($json);
   }
 
   public function getPersonByWeight($weight) {
