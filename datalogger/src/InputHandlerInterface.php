@@ -6,7 +6,7 @@ interface InputHandlerInterface {
   /**
    * @return InputValidatorInterface
    */
-  public function getVerification();
+  public function getValidator();
 
   /**
    * The verified data;

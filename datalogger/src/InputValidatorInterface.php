@@ -7,7 +7,7 @@ interface InputValidatorInterface {
    * Verifies the input arguments are valid.
    * @throws /InvalidArgumentException
    */
-  public function verify();
+  public function validate();
 
   /**
    * Add values that need to be verified.

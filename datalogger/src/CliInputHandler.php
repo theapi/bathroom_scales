@@ -17,23 +17,23 @@ class CliInputHandler implements InputHandlerInterface {
   /**
    * @var InputValidatorInterface
    */
-  private $verification;
+  private $validator;
 
   /**
    * CsvIputHandler constructor.
    *
    * @param \Theapi\Datalogger\PeopleInterface $people
    */
-  public function __construct(PeopleInterface $people, InputValidatorInterface $verification) {
+  public function __construct(PeopleInterface $people, InputValidatorInterface $validator) {
     $this->people = $people;
-    $this->verification = $verification;
+    $this->validator = $validator;
   }
 
   /**
    * @inheritdoc
    */
-  public function getVerification() {
-    return $this->verification;
+  public function getValidator() {
+    return $this->validator;
   }
 
   /**
@@ -45,15 +45,15 @@ class CliInputHandler implements InputHandlerInterface {
       throw new \InvalidArgumentException('Weight value missing, eg -w=90');
     }
     $weight = $options['w'];
-    $this->getVerification()->getArgument('Weight')->setValue($weight);
+    $this->getValidator()->getArgument('Weight')->setValue($weight);
 
     if (!isset($options['b'])) {
       throw new \InvalidArgumentException('Battery voltage value missing, eg -b=3700');
     }
     $battery = $options['b'];
-    $this->getVerification()->getArgument('Battery')->setValue($battery);
+    $this->getValidator()->getArgument('Battery')->setValue($battery);
 
-    $this->getVerification()->verify();
+    $this->getValidator()->validate();
 
     echo "OK\n";
 

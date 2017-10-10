@@ -23,6 +23,12 @@ class InputValidator implements InputValidatorInterface {
     throw new \InvalidArgumentException("Argument not set: $name");
   }
 
+  public function validate() {
+    foreach($this->data as $arg) {
+      $arg->validate();
+    }
+  }
+
   /**
    * @inheritDoc
    */

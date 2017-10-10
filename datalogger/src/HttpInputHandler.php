@@ -17,49 +17,53 @@ class HttpInputHandler implements InputHandlerInterface {
   /**
    * @var InputValidatorInterface
    */
-  private $verification;
+  private $validator;
 
   /**
    * CsvIputHandler constructor.
    *
    * @param \Theapi\Datalogger\PeopleInterface $people
    */
-  public function __construct(PeopleInterface $people, InputValidatorInterface $verification) {
+  public function __construct(PeopleInterface $people, InputValidatorInterface $validator) {
     $this->people = $people;
-    $this->verification = $verification;
+    $this->validator = $validator;
   }
 
   /**
    * @inheritdoc
    */
-  public function getVerification() {
-    return $this->verification;
+  public function getValidator() {
+    return $this->validator;
   }
 
   /**
    * @inheritdoc
    */
   public function getDataRow() {
+
     if (!isset($_GET['w'])) {
-      throw new \InvalidArgumentException('Weight value missing');
+      $msg = 'Weight value missing';
     }
-    $weight = (int) $_GET['w'];
-
     if (!isset($_GET['b'])) {
-      throw new \InvalidArgumentException('Battery voltage value missing');
+      $msg = 'Battery voltage value missing';
     }
-    $battery = (int) $_GET['b'];
 
-    $this->getVerification()->getArgument('Weight')->setValue($weight);
-    $this->getVerification()->getArgument('Battery')->setValue($battery);
-
-    $this->getVerification()->verify();
+    if (!isset($msg)) {
+      $msg = 'OK';
+      $this->getValidator()->getArgument('Weight')->setValue((int) $_GET['w']);
+      $this->getValidator()->getArgument('Battery')->setValue((int) $_GET['b']);
+      try {
+        $this->getValidator()->validate();
+      } catch (\InvalidArgumentException $e) {
+        $msg = $e->getMessage();
+      }
+    }
 
     // Tell the client immediately that the message was received.
     ob_start();
 
     // Send response.
-    echo "OK";
+    echo $msg;
 
     // Get the size of the output.
     $size = ob_get_length();

@@ -10,26 +10,9 @@ interface InputArgumentInterface {
   public function getName();
 
   /**
-   * The php filter options used to verify the input.
+   * Validates the input argument.
    */
-  public function getFilterOptions();
-
-  /**
-   * The php filter options used to verify the input.
-   */
-  public function setFilterOptions($options);
-
-  /**
-   * The php filter.
-   * @return int
-   */
-  public function getFilter();
-
-  /**
-   * The php filter.
-   * @return self
-   */
-  public function setFilter($filter);
+  public function validate();
 
   /**
    * The value that needs to be verified.
@@ -41,5 +24,5 @@ interface InputArgumentInterface {
    * The value that needs to be verified.
    * @return mixed
    */
-  public function getValue($value);
+  public function getValue();
 }
