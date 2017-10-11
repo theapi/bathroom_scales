@@ -1,8 +1,10 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Output;
 
 use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
+use Theapi\Datalogger\Config;
+use Theapi\Datalogger\Data\DataRowInterface;
 
 define('APPLICATION_NAME', 'Google Sheets API');
 // If modifying these scopes, delete the previously saved credentials

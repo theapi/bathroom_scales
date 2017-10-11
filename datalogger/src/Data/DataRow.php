@@ -1,10 +1,17 @@
 <?php
 
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Data;
 
-
+/**
+ * Class DataRow
+ *
+ * @package Theapi\Datalogger\Data
+ */
 class DataRow implements DataRowInterface {
 
+  /**
+   * @var array
+   */
   private $data = array();
 
   /**
@@ -52,7 +59,7 @@ class DataRow implements DataRowInterface {
    * @inheritDoc
    */
   public function setTimestamp() {
-  	return $this->setValue('timestamp', date('c'));
+    return $this->setValue('timestamp', date('c'));
   }
   
   /**
@@ -80,7 +87,7 @@ class DataRow implements DataRowInterface {
    * @inheritDoc
    */
   public function timestamp() {
-  	return $this->getValue('timestamp');
+    return $this->getValue('timestamp');
   }
   
 }

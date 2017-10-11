@@ -1,13 +1,14 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
+
+use Theapi\Datalogger\Data\DataRowInterface;
 
 interface InputHandlerInterface {
 
   /**
-   * Verifies the input arguments are valid.
-   * @throws /InvalidArgumentException
+   * @return InputValidatorInterface
    */
-  public function verify();
+  public function getValidator();
 
   /**
    * The verified data;

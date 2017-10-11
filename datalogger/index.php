@@ -5,26 +5,36 @@
  * Credential must have be setup with the cli script authorize_google_sheets.php
  */
 
-use Theapi\Datalogger\DataProcessor;
-use Theapi\Datalogger\GoogleSheetsOutputHandler;
-use Theapi\Datalogger\HttpInputHandler;
-use Theapi\Datalogger\People;
+use Theapi\Datalogger\Config\Config;
+use Theapi\Datalogger\Data\DataLogger;
+use Theapi\Datalogger\Input\BatteryInputArgument;
+use Theapi\Datalogger\Input\HttpInputHandler;
+use Theapi\Datalogger\Input\InputValidator;
+use Theapi\Datalogger\Input\WeightInputArgument;
+use Theapi\Datalogger\Output\GoogleSheetsOutputHandler;
+use Theapi\Datalogger\People\People;
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'settings.php';
 
 
 // Configuration for Google sheets.
-$config = new Theapi\Datalogger\Config();
-$config->setValue('spreadsheet_id', SPREADSHEET_ID)
-  ->setValue('people', PEOPLE)
+$config = (new Config())
+  ->setValue('spreadsheet_id', SPREADSHEET_ID)
   ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
   ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
-$people = new People($config);
-$data_processor = new DataProcessor();
-$data_processor
-    ->addInputHandler(new HttpInputHandler($people))
-    ->addOutputHandler(new GoogleSheetsOutputHandler($config));
+$validator = (new InputValidator())
+  ->addArgument(new WeightInputArgument())
+  ->addArgument(new BatteryInputArgument());
+$people = new People(PEOPLE);
 
-$data_processor->run();
+$logger = (new DataLogger())
+  ->addInputHandler(new HttpInputHandler($people, $validator))
+  ->addOutputHandler(new GoogleSheetsOutputHandler($config));
+
+try {
+  $logger->run();
+} catch (\InvalidArgumentException $e) {
+  echo $e->getMessage() . "\n";
+}

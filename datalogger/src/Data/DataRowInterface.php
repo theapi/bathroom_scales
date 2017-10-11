@@ -1,5 +1,5 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Data;
 
 interface DataRowInterface {
 
