@@ -23,7 +23,7 @@ void setup() {
     Serial.begin(115200);
     Serial.println();
     
-    wifiMulti.addAP(WIFI_SID, WIFI_PASSWORD);
+    
 
     // Perform everything needed while awake.
     awake();
@@ -42,26 +42,29 @@ void loop() {
 
 void awake() {
 
-    esp_sleep_wakeup_cause_t wakeup_reason;
-
-    wakeup_reason = esp_sleep_get_wakeup_cause();
-  
-    switch(wakeup_reason) {
-      case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-      case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-      case 3  : Serial.println("Wakeup caused by timer"); break;
-      case 4  : Serial.println("Wakeup caused by touchpad"); break;
-      case 5  : Serial.println("Wakeup caused by ULP program"); break;
-      default : Serial.println("Wakeup was not caused by deep sleep"); break;
+    // Read the battery voltage.
+    int battery = 0;
+    for (int i = 0; i < 8; i++) {
+      // Voltage divider halves the input.
+      battery += analogRead(26) * 2;
     }
-  
+    battery = battery / 8;
+
+    int weight = 99;
+
+    // Connect to wifi.
+    wifiMulti.addAP(WIFI_SID, WIFI_PASSWORD);
     // wait for WiFi connection
     if((wifiMulti.run() == WL_CONNECTED)) {
 
         HTTPClient http;
-        http.begin("http://192.168.0.22/bathroom_scales.php?w=99&b=1234"); 
-        Serial.print("[HTTP] GET...\n");
+        char url[100];
+        snprintf(url, 100, "http://192.168.0.22/bathroom_scales.php?w=%d&b=%d", weight, battery);
+        //String url = String("http://192.168.0.22/bathroom_scales.php?w=" + weight );
+        //url = url +  String("b=" + battery_mv);
         
+        http.begin(url); 
+
         // start connection and send HTTP header
         int httpCode = http.GET();
         // httpCode will be negative on error
