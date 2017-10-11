@@ -20,8 +20,8 @@ void setup() {
     // Slow down the cpu for use with the hx711 library
     rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
     
-    Serial.begin(115200);
-    Serial.println();
+    //Serial.begin(115200);
+    //Serial.println();
     
     
 
@@ -31,7 +31,7 @@ void setup() {
     // Get ready to sleep
     esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
     // Now sleep
-    Serial.print("Awake for: "); Serial.println(millis());
+    //Serial.print("Awake for: "); Serial.println(millis());
     esp_deep_sleep_start();
 
 }
@@ -43,12 +43,9 @@ void loop() {
 void awake() {
 
     // Read the battery voltage.
-    int battery = 0;
-    for (int i = 0; i < 8; i++) {
-      // Voltage divider halves the input.
-      battery += analogRead(26) * 2;
-    }
-    battery = battery / 8;
+    int battery = battery_mv();
+    //Serial.print("Batt: ");
+    //Serial.println(battery);
 
     int weight = 99;
 
@@ -70,19 +67,35 @@ void awake() {
         // httpCode will be negative on error
         if (httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
-            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+            //Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
             // file found at server
             if (httpCode == HTTP_CODE_OK) {
                 String payload = http.getString();
-                Serial.println(payload);
+                //Serial.println(payload);
             }
         } else {
-            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+            //Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
 
         http.end();
     }
 
 }
+
+int battery_mv() {
+  int val = 0;
+  float mv = 0;
+
+  // Junk the first reading
+  val = analogRead(35);
+  val = analogRead(35);
+  //float mv = (3.287 / 4095.0) * val * 2;
+  // Calibration:
+  // 2096 = 1856
+  // 1856 / 2096 = 0.885496183
+  mv = 0.885496183 * val * 2;
+  return mv;
+}
+
 
