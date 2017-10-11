@@ -1,5 +1,7 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Output;
+
+use Theapi\Datalogger\Data\DataRowInterface;
 
 /**
  * Interface OutputHandlerInterface
@@ -9,7 +11,7 @@ namespace Theapi\Datalogger;
 interface OutputHandlerInterface {
 
   /**
-   * @param \Theapi\Datalogger\DataRowInterface $data
+   * @param DataRowInterface $data
    *
    * @return mixed
    */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Config;
 
 
 class Config implements ConfigInterface {

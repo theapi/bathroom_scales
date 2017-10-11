@@ -1,6 +1,6 @@
 <?php
 
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
 
 
 abstract class BaseInputArgument implements InputArgumentInterface {

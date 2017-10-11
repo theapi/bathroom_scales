@@ -1,19 +1,19 @@
 <?php
 
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
 
 /**
- * Class WeightInputArgument
+ * Class BatteryInputArgument
  *
  * @package Theapi\Datalogger
  */
-class WeightInputArgument extends BaseInputArgument implements InputArgumentInterface {
+class BatteryInputArgument extends BaseInputArgument implements InputArgumentInterface {
 
   /**
    * @inheritDoc
    */
   public function getName() {
-    return 'Weight';
+    return 'Battery';
   }
 
   /**
@@ -23,7 +23,7 @@ class WeightInputArgument extends BaseInputArgument implements InputArgumentInte
     $options = [
       'options' => [
         'min_range' => 0,
-        'max_range' => 150,
+        'max_range' => 6000,
       ]
     ];
     if (filter_var($this->getValue(), FILTER_VALIDATE_INT, $options) === FALSE) {

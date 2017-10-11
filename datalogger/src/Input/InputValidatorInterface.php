@@ -1,5 +1,5 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
 
 interface InputValidatorInterface {
 
@@ -12,9 +12,9 @@ interface InputValidatorInterface {
   /**
    * Add values that need to be verified.
    *
-   * @param \Theapi\Datalogger\InputArgumentInterface $value
+   * @param InputArgumentInterface $value
    *
-   * @return \Theapi\Datalogger\InputValidatorInterface
+   * @return InputValidatorInterface
    */
   public function addArgument(InputArgumentInterface $value);
 

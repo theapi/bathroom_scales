@@ -1,5 +1,7 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
+
+use Theapi\Datalogger\Data\DataRowInterface;
 
 interface InputHandlerInterface {
 

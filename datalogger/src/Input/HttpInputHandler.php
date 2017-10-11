@@ -1,6 +1,10 @@
 <?php
 
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Input;
+
+use Theapi\Datalogger\Data\DataRow;
+use Theapi\Datalogger\People\PeopleInterface;
+
 
 /**
  * Class HttpInputHandler
@@ -22,7 +26,7 @@ class HttpInputHandler implements InputHandlerInterface {
   /**
    * CsvIputHandler constructor.
    *
-   * @param \Theapi\Datalogger\PeopleInterface $people
+   * @param PeopleInterface $people
    */
   public function __construct(PeopleInterface $people, InputValidatorInterface $validator) {
     $this->people = $people;
@@ -84,11 +88,15 @@ class HttpInputHandler implements InputHandlerInterface {
     ob_flush();
     flush();
 
-    return (new DataRow())
-      ->setPerson($this->people->getPersonByWeight($weight))
-      ->setWeight($weight)
-      ->setBattery($battery)
-      ->setTimestamp();
+    if (isset($weight) && isset($battery)) {
+      return (new DataRow())
+        ->setPerson($this->people->getPersonByWeight($weight))
+        ->setWeight($weight)
+        ->setBattery($battery)
+        ->setTimestamp();
+    }
+
+    throw new \InvalidArgumentException($msg);
   }
 
 }

@@ -3,29 +3,28 @@
  * Acknowledges a reading from the scales and updates the csv data log.
  */
 
-use Theapi\Datalogger\BatteryInputArgument;
-use Theapi\Datalogger\CliInputHandler;
-use Theapi\Datalogger\CsvOutputHandler;
-use Theapi\Datalogger\DataProcessor;
-use Theapi\Datalogger\InputValidator;
-use Theapi\Datalogger\People;
-use Theapi\Datalogger\WeightInputArgument;
+use Theapi\Datalogger\Data\DataLogger;
+use Theapi\Datalogger\Input\BatteryInputArgument;
+use Theapi\Datalogger\Input\CliInputHandler;
+use Theapi\Datalogger\Input\InputValidator;
+use Theapi\Datalogger\Input\WeightInputArgument;
+use Theapi\Datalogger\Output\CsvOutputHandler;
+use Theapi\Datalogger\People\People;
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'settings.php';
 
-
-$validator = new InputValidator();
-$validator->addArgument(new WeightInputArgument());
-$validator->addArgument(new BatteryInputArgument());
+$validator = (new InputValidator())
+  ->addArgument(new WeightInputArgument())
+  ->addArgument(new BatteryInputArgument());
 $people = new People(PEOPLE);
-$data_processor = new DataProcessor();
-$data_processor
-    ->addInputHandler(new CliInputHandler($people, $validator))
-    ->addOutputHandler(new CsvOutputHandler(CSV_FILE));
+
+$logger = (new DataLogger())
+  ->addInputHandler(new CliInputHandler($people, $validator))
+  ->addOutputHandler(new CsvOutputHandler(CSV_FILE));
 
 try {
-  $data_processor->run();
+  $logger->run();
 } catch (\InvalidArgumentException $e) {
   echo $e->getMessage() . "\n";
 }

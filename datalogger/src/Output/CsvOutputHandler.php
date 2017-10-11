@@ -1,5 +1,7 @@
 <?php
-namespace Theapi\Datalogger;
+namespace Theapi\Datalogger\Output;
+
+use Theapi\Datalogger\Data\DataRowInterface;
 
 
 /**
