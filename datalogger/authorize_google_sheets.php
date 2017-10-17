@@ -6,8 +6,9 @@
  * https://console.developers.google.com/apis/credentials?project=bathroom-scales
  */
 
-use Theapi\Datalogger\GoogleSheetsOutputHandler;
-use Theapi\Datalogger\People;
+use Theapi\Datalogger\Config\Config;
+use Theapi\Datalogger\Output\GoogleSheetsOutputHandler;
+use Theapi\Datalogger\People\People;
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'settings.php';
@@ -16,14 +17,13 @@ if (php_sapi_name() != 'cli') {
   throw new Exception('This application must be run on the command line.');
 }
 
-$config = new Theapi\Datalogger\Config();
+$config = new Config();
 $config->setValue('spreadsheet_id', SPREADSHEET_ID)
-  ->setValue('people', PEOPLE)
   ->setValue('CREDENTIALS_PATH', CREDENTIALS_PATH)
   ->setValue('CLIENT_SECRET_PATH', CLIENT_SECRET_PATH);
 
-$people = new People($config);
-$sheets = new GoogleSheetsOutputHandler($config, $people);
+$people = new People(PEOPLE);
+$sheets = new GoogleSheetsOutputHandler($config);
 
 // Get the API client and construct the service object.
 $client = $sheets->getClient();

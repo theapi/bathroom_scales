@@ -3,7 +3,7 @@ namespace Theapi\Datalogger\Output;
 
 use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
-use Theapi\Datalogger\Config;
+use Theapi\Datalogger\Config\Config;
 use Theapi\Datalogger\Data\DataRowInterface;
 
 define('APPLICATION_NAME', 'Google Sheets API');
