@@ -22,7 +22,9 @@ Pranav Cherukupalli <cherukupallip@gmail.com>
 */
 
 //#define BUTTON_PIN_BITMASK 0x200000000 // 2^33 in hex
-
+//#define BUTTON_PIN_BITMASK 0x004000000 // 2^26 // Doesn't work
+//#define BUTTON_PIN_BITMASK 0x008000000 // 2^27
+#define BUTTON_PIN_BITMASK 0x400000000 // 2^34
 
 RTC_DATA_ATTR int bootCount = 0;
 
@@ -31,7 +33,19 @@ Method to print the reason by which ESP32
 has been awaken from sleep
 */
 void print_wakeup_reason(){
-  esp_sleep_wakeup_cause_t wakeup_reason;
+
+}
+
+void setup(){
+  Serial.begin(115200);
+  pinMode(GPIO_NUM_34, INPUT);
+
+  //Increment boot number and print it every reboot
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
+  //Print the wakeup reason for ESP32
+    esp_sleep_wakeup_cause_t wakeup_reason;
 
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
@@ -44,18 +58,18 @@ void print_wakeup_reason(){
     case 5  : Serial.println("Wakeup caused by ULP program"); break;
     default : Serial.println("Wakeup was not caused by deep sleep"); break;
   }
-}
+ 
+  if (wakeup_reason == ESP_SLEEP_WAKEUP_EXT1) {
 
-void setup(){
-  Serial.begin(115200);
-  pinMode(GPIO_NUM_26, INPUT);
-
-  //Increment boot number and print it every reboot
-  ++bootCount;
-  Serial.println("Boot number: " + String(bootCount));
-
-  //Print the wakeup reason for ESP32
-  print_wakeup_reason();
+    uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
+            if (wakeup_pin_mask != 0) {
+                int pin = __builtin_ffsll(wakeup_pin_mask) - 1;
+                Serial.print("Wake up from GPIO");
+                Serial.println(pin);
+            } else {
+                Serial.println("Wake up from GPIO");
+            }
+  }
 
   /*
   First we configure the wake up source
@@ -67,17 +81,19 @@ void setup(){
   Note that using internal pullups/pulldowns also requires
   RTC peripherals to be turned on.
   */
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_26,1); //1 = High, 0 = Low
+  //esp_sleep_enable_ext0_wakeup(GPIO_NUM_26,1); //1 = High, 0 = Low
 
   //If you were to use ext1, you would use it like
   //esp_deep_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
-  //esp_sleep_enable_ext1_wakeup(BIT(GPIO_NUM_26), ESP_EXT1_WAKEUP_ANY_HIGH);
+  esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
+  //esp_sleep_enable_ext1_wakeup(BIT(GPIO_NUM_33), ESP_EXT1_WAKEUP_ANY_HIGH);
 
   
 }
 
 void loop() {
-  byte val = digitalRead(GPIO_NUM_26);
+  //byte val = digitalRead(GPIO_NUM_26);
+  byte val = digitalRead(GPIO_NUM_33);
   Serial.println(val);
 
   // Sleep on low.
