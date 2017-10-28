@@ -93,7 +93,7 @@ void setup(){
 
 void loop() {
   //byte val = digitalRead(GPIO_NUM_26);
-  byte val = digitalRead(GPIO_NUM_33);
+  byte val = digitalRead(GPIO_NUM_34);
   Serial.println(val);
 
   // Sleep on low.
