@@ -1,10 +1,15 @@
 
-#define LCD_PIN_5 GPIO_NUM_21
-#define LCD_PIN_6 GPIO_NUM_17
-#define LCD_PIN_7 GPIO_NUM_16
-#define LCD_PIN_8 GPIO_NUM_19
-#define LCD_PIN_9 GPIO_NUM_18
+/**
+ * See https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts
+ */
+#define LCD_PIN_5  GPIO_NUM_21
+#define LCD_PIN_6  GPIO_NUM_17
+#define LCD_PIN_7  GPIO_NUM_16
+#define LCD_PIN_8  GPIO_NUM_19
+#define LCD_PIN_9  GPIO_NUM_18
 #define LCD_PIN_10 GPIO_NUM_5
+#define LCD_PIN_11 GPIO_NUM_4
+#define LCD_PIN_12 GPIO_NUM_36
 
 #define COM_HIGH 3300 // The analog reading that indicates active on the com line.
 
@@ -30,8 +35,8 @@ uint16_t getPinValues() {
   bitWrite(pins, 8, digitalRead(LCD_PIN_8));
   bitWrite(pins, 9, digitalRead(LCD_PIN_9));
   bitWrite(pins, 10, digitalRead(LCD_PIN_10));
-//  bitWrite(pins, 11, digitalRead(LCD_PIN_11));
-//  bitWrite(pins, 12, digitalRead(LCD_PIN_12));
+  bitWrite(pins, 11, digitalRead(LCD_PIN_11));
+  bitWrite(pins, 12, digitalRead(LCD_PIN_12));
 
   return pins;
 }
@@ -169,6 +174,16 @@ uint8_t digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
   return segmentsAsNumber(segs);
 }
 
+/**
+ * The value on the screen for digit 3.
+ */
+uint8_t digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+  // Digit zero is pins 11 & 12.
+  uint8_t segs = getSegmentsForDigit(11, 12, com3_pins, com2_pins, com1_pins, com0_pins);
+
+  return segmentsAsNumber(segs);
+}
+
 void setup() {
   Serial.begin(115200);
   pinMode(LCD_PIN_5, INPUT);
@@ -177,6 +192,8 @@ void setup() {
   pinMode(LCD_PIN_8, INPUT);
   pinMode(LCD_PIN_9, INPUT);
   pinMode(LCD_PIN_10, INPUT);
+  pinMode(LCD_PIN_11, INPUT);
+  pinMode(LCD_PIN_12, INPUT);
 }
 
 void loop() {
@@ -218,12 +235,16 @@ void loop() {
 //    Serial.print("COM3: "); 
 //    Serial.println(com3_pins, BIN);
 
+    uint8_t digit3 = digitDecode3(com3_pins, com2_pins, com1_pins, com0_pins);
     uint8_t digit2 = digitDecode2(com3_pins, com2_pins, com1_pins, com0_pins);
     uint8_t digit1 = digitDecode1(com3_pins, com2_pins, com1_pins, com0_pins);
     uint8_t digit0 = digitDecode0(com3_pins, com2_pins, com1_pins, com0_pins);
     
     //Serial.print("Reading: "); 
     if (digit0 != 11) {
+      if (digit3 != 11) {
+        Serial.print(digit3, DEC);
+      }
       if (digit2 != 11) {
         Serial.print(digit2, DEC);
       }
