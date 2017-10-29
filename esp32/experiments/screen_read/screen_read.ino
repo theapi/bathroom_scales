@@ -1,7 +1,10 @@
 
+#define LCD_PIN_5 GPIO_NUM_21
+#define LCD_PIN_6 GPIO_NUM_17
+#define LCD_PIN_7 GPIO_NUM_16
+#define LCD_PIN_8 GPIO_NUM_19
 
-#define LCD_PIN_7 GPIO_NUM_21
-#define LCD_PIN_8 GPIO_NUM_17
+
 #define COM_HIGH 3300 // The analog reading that indicates active on the com line.
 
 
@@ -20,8 +23,8 @@ uint16_t getPinValues() {
   // 16 bits: 0  0  0  0  0   0   0   0  0  0  0  0  0  0  0  0  0
   // So bit 12 is pin 12.
 
-//  bitWrite(pins, 5, digitalRead(LCD_PIN_5));
-//  bitWrite(pins, 6, digitalRead(LCD_PIN_6));
+  bitWrite(pins, 5, digitalRead(LCD_PIN_5));
+  bitWrite(pins, 6, digitalRead(LCD_PIN_6));
   bitWrite(pins, 7, digitalRead(LCD_PIN_7));
   bitWrite(pins, 8, digitalRead(LCD_PIN_8));
 //  bitWrite(pins, 9, digitalRead(LCD_PIN_9));
@@ -157,6 +160,8 @@ uint8_t digitDecode1(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
 
 void setup() {
   Serial.begin(115200);
+  pinMode(LCD_PIN_5, INPUT);
+  pinMode(LCD_PIN_6, INPUT);
   pinMode(LCD_PIN_7, INPUT);
   pinMode(LCD_PIN_8, INPUT);
 }
@@ -191,18 +196,24 @@ void loop() {
   if (now - read_out_last >= read_out_interval) {
     read_out_last = now;
 
-    Serial.print("COM0: "); 
-    Serial.println(com0_pins, BIN);
-    Serial.print("COM1: "); 
-    Serial.println(com1_pins, BIN);
-    Serial.print("COM2: "); 
-    Serial.println(com2_pins, BIN);
-    Serial.print("COM3: "); 
-    Serial.println(com3_pins, BIN);
-    
+//    Serial.print("COM0: "); 
+//    Serial.println(com0_pins, BIN);
+//    Serial.print("COM1: "); 
+//    Serial.println(com1_pins, BIN);
+//    Serial.print("COM2: "); 
+//    Serial.println(com2_pins, BIN);
+//    Serial.print("COM3: "); 
+//    Serial.println(com3_pins, BIN);
+
+    uint8_t digit0 = digitDecode0(com3_pins, com2_pins, com1_pins, com0_pins);
     uint8_t digit1 = digitDecode1(com3_pins, com2_pins, com1_pins, com0_pins);
-    Serial.print("DIGIT 1: "); 
-    Serial.println(digit1, DEC);
+    Serial.print("Reading: "); 
+    if (digit0 != 11) {
+      Serial.print(digit1, DEC);
+      Serial.print(".");
+      Serial.print(digit0, DEC);
+    }
+    Serial.println();
     
     Serial.println();
   }
