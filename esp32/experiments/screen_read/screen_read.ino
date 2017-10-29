@@ -11,7 +11,7 @@
 /**
  * How long to wait before updating the read out.
  */
-const long read_out_interval = 500;
+const long read_out_interval = 250;
 
 /**
  * Get the current pin values.
@@ -207,13 +207,13 @@ void loop() {
 
     uint8_t digit0 = digitDecode0(com3_pins, com2_pins, com1_pins, com0_pins);
     uint8_t digit1 = digitDecode1(com3_pins, com2_pins, com1_pins, com0_pins);
-    Serial.print("Reading: "); 
+    //Serial.print("Reading: "); 
     if (digit0 != 11) {
       Serial.print(digit1, DEC);
       Serial.print(".");
       Serial.print(digit0, DEC);
     }
-    Serial.println();
+    //Serial.println();
     
     Serial.println();
   }
