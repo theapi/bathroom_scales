@@ -1,4 +1,12 @@
 
+#include <Arduino.h>
+
+#include <WiFi.h>
+#include <WiFiMulti.h>
+#include <HTTPClient.h>
+#include "soc/rtc.h"
+#include "credentials.h"
+
 /**
  * See https://learn.adafruit.com/adafruit-huzzah32-esp32-feather/pinouts
  */
@@ -13,6 +21,10 @@
 
 #define COM_HIGH 3300 // The analog reading that indicates active on the com line.
 
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  2        /* Time ESP32 will go to sleep (in seconds) */
+
+WiFiMulti wifiMulti;
 
 /**
  * How long to wait before updating the read out.
@@ -185,6 +197,9 @@ uint8_t digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
 }
 
 void setup() {
+
+
+  
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LCD_PIN_5, INPUT);
@@ -197,10 +212,15 @@ void setup() {
   pinMode(LCD_PIN_12, INPUT);
 
   digitalWrite(LED_BUILTIN, HIGH);
+
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
 }
 
 void loop() {
   static unsigned long read_out_last = 0;
+
+  static uint16_t same_count = 0;
+  static uint16_t last_reading = 0;
 
   static uint16_t com0_pins = 0;
   static uint16_t com1_pins = 0;
@@ -255,10 +275,84 @@ void loop() {
       Serial.print(".");
       Serial.print(digit0, DEC);
     }
-    //Serial.println();
-    
     Serial.println();
+
+    if (digit1 != 11) {
+      uint16_t weight = 0;
+      weight = (digit3 * 1000) + (digit2 * 100) + (digit1 * 10) + digit0;
+      if (last_reading == weight) {
+        same_count++;
+        if (same_count > 32) {
+          same_count = 0;
+          Serial.println("SEND");
+          sendReading(weight);
+          esp_deep_sleep_start();
+          
+        }
+      } else {
+        same_count = 0;
+      }
+      last_reading = weight;
+    } 
+    else {
+      last_reading = 0;
+    }
+    
   }
 
+}
+
+int battery_mv() {
+  int val = 0;
+  float mv = 0;
+
+  // Junk the first reading
+  val = analogRead(35);
+  val = analogRead(35);
+  //float mv = (3.287 / 4095.0) * val * 2;
+  // Calibration:
+  // 2123 * 2 = 3865 mV
+  // 3865 / 4246 = 0.910268488
+  mv = 0.910268488 * val * 2;
+  return mv;
+}
+
+void sendReading(uint16_t weight) {
+      // Read the battery voltage.
+    int battery = battery_mv();
+    Serial.print("Batt: ");
+    Serial.println(battery);
+
+    // Connect to wifi.
+    wifiMulti.addAP(WIFI_SID, WIFI_PASSWORD);
+    // wait for WiFi connection
+    if((wifiMulti.run() == WL_CONNECTED)) {
+
+        HTTPClient http;
+        char url[100];
+        snprintf(url, 100, "http://192.168.0.22/bathroom_scales.php?w=%d&b=%d", weight, battery);
+        //String url = String("http://192.168.0.22/bathroom_scales.php?w=" + weight );
+        //url = url +  String("b=" + battery_mv);
+        
+        http.begin(url); 
+
+        // start connection and send HTTP header
+        int httpCode = http.GET();
+        // httpCode will be negative on error
+        if (httpCode > 0) {
+            // HTTP header has been send and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+            // file found at server
+            if (httpCode == HTTP_CODE_OK) {
+                String payload = http.getString();
+                Serial.println(payload);
+            }
+        } else {
+            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+
+        http.end();
+    }
 }
 
