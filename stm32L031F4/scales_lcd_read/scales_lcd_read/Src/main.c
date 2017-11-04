@@ -45,6 +45,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "string.h"
+#include "stdlib.h"
 
 /* USER CODE END Includes */
 
@@ -111,7 +112,7 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-      HAL_ADC_Start(&hadc);
+      //HAL_ADC_Start(&hadc);
       HAL_ADC_PollForConversion(&hadc, 100);
       uint32_t com1 = HAL_ADC_GetValue(&hadc);
       //HAL_ADC_Stop(&hadc);
@@ -125,15 +126,16 @@ int main(void)
       uint8_t pin11 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
       uint8_t pin12 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
 
-      //uint32_t pin_values = GPIOA->IDR;
-      //char pin_values_str [33];
-      //itoa (pin_values, pin_values_str, 2);
+      uint32_t pin_values = GPIOA->IDR;
+      char pin_values_str [33];
+      itoa (pin_values, pin_values_str, 2);
       //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
 
       sprintf(tx1_buffer,
-              "id:%d, com1:%d, pins: %d%d%d%d%d%d%d%d\n",
+              "id:%d, com1:%u, pins: %d%d%d%d%d%d%d%d, idr: %s\n",
               count, com1,
-              pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12
+              pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12,
+              pin_values_str
               );
 
       HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
