@@ -44,6 +44,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include "string.h"
 
 /* USER CODE END Includes */
 
@@ -99,6 +100,8 @@ int main(void)
     char tx1_buffer[120];
     int count = 0;
 
+    HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
+    HAL_ADC_Start(&hadc);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,10 +111,35 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-      sprintf(tx1_buffer, "id:%d", count);
-      HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
+      HAL_ADC_Start(&hadc);
+      HAL_ADC_PollForConversion(&hadc, 100);
+      uint32_t com1 = HAL_ADC_GetValue(&hadc);
+      //HAL_ADC_Stop(&hadc);
 
+      uint8_t pin5 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+      uint8_t pin6 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2);
+      uint8_t pin7 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3);
+      uint8_t pin8 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
+      uint8_t pin9 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5);
+      uint8_t pin10 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6);
+      uint8_t pin11 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
+      uint8_t pin12 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
+
+      //uint32_t pin_values = GPIOA->IDR;
+      //char pin_values_str [33];
+      //itoa (pin_values, pin_values_str, 2);
+      //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
+
+      sprintf(tx1_buffer,
+              "id:%d, com1:%d, pins: %d%d%d%d%d%d%d%d\n",
+              count, com1,
+              pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12
+              );
+
+      HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
+      count++;
       HAL_Delay(1000);
+
   }
   /* USER CODE END 3 */
 
@@ -157,7 +185,7 @@ void SystemClock_Config(void)
   }
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_SYSCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -176,6 +204,16 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/**
+ * Callback for HAL_GPIO_EXTI_IRQHandler()
+ * in EXTI0_1_IRQHandler().
+ *
+ * Handles the external interrupt.
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    //@todo
+}
 
 /* USER CODE END 4 */
 
