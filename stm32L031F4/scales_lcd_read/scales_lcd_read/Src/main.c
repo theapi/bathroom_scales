@@ -97,12 +97,25 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  /* Buffer used for transmission on USART2 */
+
+  /* Check if the system was resumed from Standby mode */
+  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
+    /* Clear Standby flag */
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  }
+
+  /* Enable Ultra low power mode */
+    HAL_PWREx_EnableUltraLowPower();
+    //HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+
+    /* Buffer used for transmission on USART2 */
     char tx1_buffer[120];
     int count = 0;
 
     HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
     HAL_ADC_Start(&hadc);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -131,9 +144,12 @@ int main(void)
       itoa (pin_values, pin_values_str, 2);
       //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
 
+      uint8_t wake_pin = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+
       sprintf(tx1_buffer,
-              "id:%d, com1:%u, pins: %d%d%d%d%d%d%d%d, idr: %s\n",
+              "id:%d, com1:%u, wake: %d pins: %d%d%d%d%d%d%d%d, idr: %s\n",
               count, com1,
+              wake_pin,
               pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12,
               pin_values_str
               );
@@ -141,6 +157,31 @@ int main(void)
       HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
       count++;
       HAL_Delay(1000);
+
+
+      // __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+      //HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+
+       /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
+        mainly when using more than one wakeup source this is to not miss any wakeup event.
+         - Disable all used wakeup sources,
+         - Clear all related wakeup flags,
+         - Re-enable all used wakeup sources,
+         - Enter the Standby mode.
+      */
+
+      /* Disable all used wakeup sources: PWR_WAKEUP_PIN3 */
+      HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
+
+      /* Clear all related wakeup flags*/
+      __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+      /* Enable WakeUp Pin PWR_WAKEUP_PIN3 connected to PA.02 (Arduino A7) */
+      HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+
+      /* Enter the Standby mode */
+      HAL_PWR_EnterSTANDBYMode();
+
 
   }
   /* USER CODE END 3 */
