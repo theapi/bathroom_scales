@@ -98,6 +98,9 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
+  /* Disable the uart for now */
+  HAL_UART_MspDeInit(&huart2);
+
   /* Check if the system was resumed from Standby mode */
   if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
     /* Clear Standby flag */
@@ -125,6 +128,10 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+
+      /* Configure and turn on the uart */
+      HAL_UART_MspInit(&huart2);
+
       //HAL_ADC_Start(&hadc);
       HAL_ADC_PollForConversion(&hadc, 100);
       uint32_t com1 = HAL_ADC_GetValue(&hadc);
@@ -155,32 +162,42 @@ int main(void)
               );
 
       HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
+
+      /* Disable the uart */
+      HAL_UART_MspDeInit(&huart2);
+      /* Reconfigure the uart pin to be input, to not drive it high */
+      GPIO_InitTypeDef GPIO_InitStruct;
+      GPIO_InitStruct.Pin = GPIO_PIN_9;
+      GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
+      GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+      HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+
       count++;
       HAL_Delay(1000);
 
 
-      // __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-      //HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
-       /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
-        mainly when using more than one wakeup source this is to not miss any wakeup event.
-         - Disable all used wakeup sources,
-         - Clear all related wakeup flags,
-         - Re-enable all used wakeup sources,
-         - Enter the Standby mode.
-      */
-
-      /* Disable all used wakeup sources: PWR_WAKEUP_PIN3 */
-      HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
-
-      /* Clear all related wakeup flags*/
-      __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-
-      /* Enable WakeUp Pin PWR_WAKEUP_PIN3 connected to PA.02 (Arduino A7) */
-      HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
-
-      /* Enter the Standby mode */
-      HAL_PWR_EnterSTANDBYMode();
+//       /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
+//        mainly when using more than one wakeup source this is to not miss any wakeup event.
+//         - Disable all used wakeup sources,
+//         - Clear all related wakeup flags,
+//         - Re-enable all used wakeup sources,
+//         - Enter the Standby mode.
+//      */
+//
+//      /* Disable all used wakeup sources: PWR_WAKEUP_PIN3 */
+//      HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
+//
+//      /* Clear all related wakeup flags*/
+//      __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+//
+//      /* Enable WakeUp Pin PWR_WAKEUP_PIN3 connected to PA.02 (Arduino A7) */
+//      HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+//
+//      /* Enter the Standby mode */
+//      HAL_PWR_EnterSTANDBYMode();
 
 
   }
