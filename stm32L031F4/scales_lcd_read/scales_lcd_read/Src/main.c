@@ -165,13 +165,6 @@ int main(void)
 
       /* Disable the uart */
       HAL_UART_MspDeInit(&huart2);
-      /* Reconfigure the uart pin to be input, to not drive it high */
-      GPIO_InitTypeDef GPIO_InitStruct;
-      GPIO_InitStruct.Pin = GPIO_PIN_9;
-      GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-      GPIO_InitStruct.Pull = GPIO_NOPULL;
-      GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-      HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
       count++;
