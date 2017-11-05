@@ -58,6 +58,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void standby();
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -168,30 +169,13 @@ int main(void)
 
 
       count++;
+
+      if (count > 10) {
+          /* After standby, setup (main) is run again */
+          standby();
+      }
+
       HAL_Delay(1000);
-
-
-
-//       /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
-//        mainly when using more than one wakeup source this is to not miss any wakeup event.
-//         - Disable all used wakeup sources,
-//         - Clear all related wakeup flags,
-//         - Re-enable all used wakeup sources,
-//         - Enter the Standby mode.
-//      */
-//
-//      /* Disable all used wakeup sources: PWR_WAKEUP_PIN3 */
-//      HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
-//
-//      /* Clear all related wakeup flags*/
-//      __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-//
-//      /* Enable WakeUp Pin PWR_WAKEUP_PIN3 connected to PA.02 (Arduino A7) */
-//      HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
-//
-//      /* Enter the Standby mode */
-//      HAL_PWR_EnterSTANDBYMode();
-
 
   }
   /* USER CODE END 3 */
@@ -257,6 +241,29 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void standby() {
+  /* The Following Wakeup sequence is highly recommended prior to each Standby mode entry
+    mainly when using more than one wakeup source this is to not miss any wakeup event.
+     - Disable all used wakeup sources,
+     - Clear all related wakeup flags,
+     - Re-enable all used wakeup sources,
+     - Enter the Standby mode.
+  */
+
+  /* Disable all used wakeup sources: PWR_WAKEUP_PIN3 */
+  HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
+
+  /* Clear all related wakeup flags*/
+  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+  /* Enable WakeUp Pin PWR_WAKEUP_PIN3 connected to PA.02 (Arduino A7) */
+  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+
+  /* Enter the Standby mode */
+  HAL_PWR_EnterSTANDBYMode();
+
+}
 
 /**
  * Callback for HAL_GPIO_EXTI_IRQHandler()
