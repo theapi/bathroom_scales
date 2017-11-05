@@ -130,8 +130,12 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-      /* Configure and turn on the uart */
-      HAL_UART_MspInit(&huart2);
+      /* The radio will pull this high when it is ready for the serial data */
+      uint8_t radio_on = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+      if (radio_on) {
+          /* Configure and turn on the uart */
+          HAL_UART_MspInit(&huart2);
+      }
 
       //HAL_ADC_Start(&hadc);
       HAL_ADC_PollForConversion(&hadc, 100);
@@ -152,20 +156,21 @@ int main(void)
       itoa (pin_values, pin_values_str, 2);
       //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
 
-      uint8_t wake_pin = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+      /* Only talk to the radio module if it is ready */
+      if (radio_on) {
+          sprintf(tx1_buffer,
+                  "id:%d, com1:%u, radio: %d, pins: %d%d%d%d%d%d%d%d, idr: %s\n",
+                  count, com1,
+                  radio_on,
+                  pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12,
+                  pin_values_str
+                  );
 
-      sprintf(tx1_buffer,
-              "id:%d, com1:%u, wake: %d pins: %d%d%d%d%d%d%d%d, idr: %s\n",
-              count, com1,
-              wake_pin,
-              pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12,
-              pin_values_str
-              );
+          HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
 
-      HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
-
-      /* Disable the uart */
-      HAL_UART_MspDeInit(&huart2);
+          /* Disable the uart */
+          HAL_UART_MspDeInit(&huart2);
+      }
 
 
       count++;
