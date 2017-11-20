@@ -46,6 +46,7 @@
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "stdlib.h"
+#include "lcd.h"
 
 /* USER CODE END Includes */
 
