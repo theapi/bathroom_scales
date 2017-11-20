@@ -3,12 +3,22 @@
 /**
  * Get the current pin values.
  */
-uint16_t LCD_getPinValues(void) {
-    uint16_t pins = 0;
-    // pins:    x, x, x, x, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-    // 16 bits: 0  0  0  0  0   0   0   0  0  0  0  0  0  0  0  0  0
+uint8_t LCD_getPinValues(void) {
+    // Of the GPIOA register, of interest are pins 1-7 & 10
+    // so of the 32bit registry: xxxx xxxx xxxx xxxx xxxx x1xx 1111 111x
 
-    uint32_t pin_values = GPIOA->IDR;
+    uint32_t port = GPIOA->IDR;
+    // pins 1-7 & pin 10
+    uint8_t pins = 0;
+    pins = (port >> 1);
+    // Read bit 10 and set its value in the pin variable.
+    if (port & GPIO_PIN_10) {
+        pins |= 1 << 7;
+    } else {
+        pins &= ~(1 << 7);
+    }
+
+    return pins;
 }
 
 /**

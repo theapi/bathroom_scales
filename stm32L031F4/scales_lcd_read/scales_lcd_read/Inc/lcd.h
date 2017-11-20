@@ -13,7 +13,7 @@ extern "C" {
 /**
  * Get the current pin values.
  */
-uint16_t LCD_getPinValues(void);
+uint8_t LCD_getPinValues(void);
 
 /**
  * Check COM0 for a high to indicate the start of the frame.

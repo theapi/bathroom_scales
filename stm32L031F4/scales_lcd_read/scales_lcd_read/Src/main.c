@@ -157,13 +157,18 @@ int main(void)
       itoa (pin_values, pin_values_str, 2);
       //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
 
+      uint8_t pins = LCD_getPinValues();
+      char pins_str [9];
+      itoa (pins, pins_str, 2);
+
       /* Only talk to the radio module if it is ready */
       if (radio_on) {
           sprintf(tx1_buffer,
-                  "id:%d, com1:%u, radio: %d, pins: %d%d%d%d%d%d%d%d, idr: %s\n",
+                  "id:%d, com1:%u, radio: %d, pins:%s pin_values: %dxx%d%d%d%d%d%d%dx, idr: %s\n",
                   count, com1,
                   radio_on,
-                  pin5, pin6, pin7, pin8, pin9, pin10, pin11, pin12,
+                  pins_str,
+                  pin12, pin11, pin10, pin9, pin8, pin7, pin6, pin5,
                   pin_values_str
                   );
 
