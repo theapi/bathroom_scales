@@ -161,10 +161,13 @@ int main(void)
       char pins_str [9];
       itoa (pins, pins_str, 2);
 
+      uint16_t weight = 1234;
+
       /* Only talk to the radio module if it is ready */
       if (radio_on) {
           sprintf(tx1_buffer,
-                  "id:%d, com1:%u, radio: %d, pins:%s pin_values: %dxx%d%d%d%d%d%d%dx, idr: %s\n",
+                  "#%d, id:%d, com1:%u, radio: %d, pins:%s pin_values: %dxx%d%d%d%d%d%d%dx, idr: %s\n",
+                  weight,
                   count, com1,
                   radio_on,
                   pins_str,
