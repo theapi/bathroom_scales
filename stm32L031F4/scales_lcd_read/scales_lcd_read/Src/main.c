@@ -68,6 +68,17 @@ void standby();
 
 /* USER CODE BEGIN 0 */
 
+typedef enum {
+    TX_STATE_SETUP,
+    TX_STATE_INIT,
+    TX_STATE_ON,
+    TX_STATE_OFF,
+    TX_STATE_TRANSMITTING,
+    TX_STATE_SLEEP,
+} TX_StateTypeDef;
+
+TX_StateTypeDef tx_state = TX_STATE_OFF;
+
 /* USER CODE END 0 */
 
 int main(void)
@@ -113,8 +124,8 @@ int main(void)
     HAL_PWREx_EnableUltraLowPower();
     //HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
 
-    /* Ensure the transmitter is on */
-          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+    /* Ensure the transmitter is off */
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 
     /* Buffer used for transmission on USART2 */
     char tx1_buffer[120];
@@ -122,6 +133,12 @@ int main(void)
 
     HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
     HAL_ADC_Start(&hadc);
+
+    uint32_t com1 = 0;
+    uint16_t weight = 1234;
+    uint8_t pins = 0;
+    GPIO_PinState radio = GPIO_PIN_SET;
+
 
 
   /* USER CODE END 2 */
@@ -135,72 +152,96 @@ int main(void)
   /* USER CODE BEGIN 3 */
 
 
+      switch (tx_state) {
+        case TX_STATE_OFF:
+            // Do the measuring
+
+
+            HAL_Delay(10000);
+
+            //HAL_ADC_Start(&hadc);
+            HAL_ADC_PollForConversion(&hadc, 100);
+            com1 = HAL_ADC_GetValue(&hadc);
+            //HAL_ADC_Stop(&hadc);
+
+//            uint8_t pin5 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+//            uint8_t pin6 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2);
+//            uint8_t pin7 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3);
+//            uint8_t pin8 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
+//            uint8_t pin9 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5);
+//            uint8_t pin10 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6);
+//            uint8_t pin11 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
+//            uint8_t pin12 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
+//
+//            uint32_t pin_values = GPIOA->IDR;
+//            char pin_values_str[33];
+//            itoa(pin_values, pin_values_str, 2);
+//            //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
+
+            pins = LCD_getPinValues();
 
 
 
 
-      //HAL_ADC_Start(&hadc);
-      HAL_ADC_PollForConversion(&hadc, 100);
-      uint32_t com1 = HAL_ADC_GetValue(&hadc);
-      //HAL_ADC_Stop(&hadc);
+            /* Got a messurement so initialise the tranmission. */
+            tx_state = TX_STATE_SETUP;
+            break;
 
-      uint8_t pin5 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
-      uint8_t pin6 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2);
-      uint8_t pin7 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3);
-      uint8_t pin8 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
-      uint8_t pin9 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5);
-      uint8_t pin10 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6);
-      uint8_t pin11 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
-      uint8_t pin12 = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
+        case TX_STATE_SETUP:
+            /* Turn on the transmitter */
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+            tx_state = TX_STATE_INIT;
+            break;
 
-      uint32_t pin_values = GPIOA->IDR;
-      char pin_values_str [33];
-      itoa (pin_values, pin_values_str, 2);
-      //sprintf(tx1_buffer, "id:%d, pins: %s, hex: %X\n", count, pin_values_str, pin_values);
+        case TX_STATE_INIT:
+            /* Wait for the transmitter to turn on */
+            /* The radio will pull this high when it is ready for the serial data */
+            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+            if (radio == GPIO_PIN_RESET) {
+                tx_state = TX_STATE_ON;
+            }
+            break;
 
-      uint8_t pins = LCD_getPinValues();
-      char pins_str [9];
-      itoa (pins, pins_str, 2);
+        case TX_STATE_ON:
+            /* Send the data */
+            /* Configure and turn on the uart */
+            HAL_UART_MspInit(&huart2);
 
-      uint16_t weight = 1234;
+            char pins_str[9];
+            itoa(pins, pins_str, 2);
+            sprintf(tx1_buffer, "#%d, id:%d, com1:%u, pins:%s\n", weight, count, com1, pins_str);
 
-      /* The radio will pull this high when it is ready for the serial data */
-      uint8_t radio_on = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+            HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
 
-      /* Only talk to the radio module if it is ready */
-      if (radio_on) {
-          /* Configure and turn on the uart */
-          HAL_UART_MspInit(&huart2);
+            /* Disable the uart */
+            HAL_UART_MspDeInit(&huart2);
 
-          sprintf(tx1_buffer,
-                  "#%d, id:%d, com1:%u, radio: %d, pins:%s pin_values: %dxx%d%d%d%d%d%d%dx, idr: %s\n",
-                  weight,
-                  count, com1,
-                  radio_on,
-                  pins_str,
-                  pin12, pin11, pin10, pin9, pin8, pin7, pin6, pin5,
-                  pin_values_str
-                  );
+            tx_state = TX_STATE_TRANSMITTING;
+            break;
 
-          HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
+        case TX_STATE_TRANSMITTING:
+            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+            if (radio == GPIO_PIN_SET) {
+                /* Transmitter finished */
+                tx_state = TX_STATE_SLEEP;
+            } else {
+                // send again
+                HAL_Delay(1000);
+                tx_state = TX_STATE_ON;
+            }
+            break;
 
-          /* Disable the uart */
-          HAL_UART_MspDeInit(&huart2);
+        case TX_STATE_SLEEP:
+            /* Turn off the transmitter */
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+            /* After standby, setup (main) is run again */
+            standby();
+            break;
       }
 
 
-      count++;
 
-      if (count > 10) {
-          HAL_Delay(2000);
-          /* Turn off the transmitter */
-          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
-          HAL_Delay(5000);
-          /* After standby, setup (main) is run again */
-          standby();
-      }
 
-      HAL_Delay(2000);
 
   }
   /* USER CODE END 3 */
