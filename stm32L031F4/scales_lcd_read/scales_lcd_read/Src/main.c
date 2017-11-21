@@ -127,8 +127,7 @@ int main(void)
     /* Ensure the transmitter is off */
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 
-    /* Buffer used for transmission on USART2 */
-    char tx1_buffer[120];
+
     int count = 0;
 
     HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
@@ -207,14 +206,18 @@ int main(void)
             /* Configure and turn on the uart */
             HAL_UART_MspInit(&huart2);
 
-            char pins_str[9];
-            itoa(pins, pins_str, 2);
-            sprintf(tx1_buffer, "#%d, id:%d, com1:%u, pins:%s\n", weight, count, com1, pins_str);
+            //char pins_str[9];
+            //itoa(pins, pins_str, 2);
+            /* Buffer used for transmission on USART2 */
+            char tx1_buffer[4];
+            tx1_buffer[0] = '#';
+            tx1_buffer[1] = (weight >> 8);
+            tx1_buffer[2] = weight;
+            tx1_buffer[3] = '\n';
+            //sprintf(tx1_buffer, "#%d\n", weight);
 
-            HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, strlen(tx1_buffer), 1000);
+            HAL_UART_Transmit(&huart2, (uint8_t*) tx1_buffer, 4, 1000);
 
-            /* Disable the uart */
-            HAL_UART_MspDeInit(&huart2);
 
             tx_state = TX_STATE_TRANSMITTING;
             break;
@@ -224,14 +227,18 @@ int main(void)
             if (radio == GPIO_PIN_SET) {
                 /* Transmitter finished */
                 tx_state = TX_STATE_SLEEP;
+
+
             } else {
                 // send again
-                HAL_Delay(1000);
-                tx_state = TX_STATE_ON;
+                //HAL_Delay(1000);
+                //tx_state = TX_STATE_ON;
             }
             break;
 
         case TX_STATE_SLEEP:
+            /* Disable the uart */
+                HAL_UART_MspDeInit(&huart2);
             /* Turn off the transmitter */
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
             /* After standby, setup (main) is run again */

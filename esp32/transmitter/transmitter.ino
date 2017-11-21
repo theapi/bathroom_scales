@@ -11,11 +11,15 @@
 HardwareSerial Serial1(2);
 
 byte tx = 0;
-
+int weight = 0;
 const char* host = "192.168.0.22";
 
 unsigned long previousMillis = 0; 
 const long timeout = 10000; 
+
+byte rx_state = 0;
+byte weight_byte_high = 0;
+byte weight_byte_low = 0;
 
 void setup() {
 
@@ -54,19 +58,42 @@ void loop() {
     byte c = Serial1.read();
 
     // Transmit only once. The reader will then cut the power.
-    if (tx == 0) {
+    //if (tx == 0) {
       // The weight reading starts with #
       if (c == '#') {
+        rx_state = 1;
+        weight = 0;
+
+        
         // Grab the weight
-        int weight = Serial1.parseInt();
+        //int weight = Serial1.parseInt();
         tx = 1;
+        
+        
+      } else if (rx_state == 1) {
+        weight_byte_high = c;
+        weight_byte_low = 0;
+        rx_state = 2;
+      } else if (rx_state == 2) {
+        weight_byte_low = c;
+        weight = (weight_byte_high << 8) | weight_byte_low;
+        //Serial1.end();
+        
         Serial.println(weight);
+        //
         transmit(weight);
   
         // Tell the reader the transmitter is finished.
         digitalWrite(PIN_COM, HIGH);
+        
+        rx_state = 3;
+
+        // Break out of the serial loop
+        //continue;
+        
       }
-    }
+      
+    //}
 
     // Passthru the rest of the data.
     Serial.write(c);
@@ -75,8 +102,15 @@ void loop() {
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= timeout) {
-    // give up :(
+    previousMillis = currentMillis;
+    // pretend power down
     digitalWrite(PIN_COM, HIGH);
+    tx = 0;
+    rx_state = 0;
+
+    //Serial1.begin(57600);
+    delay(1000);
+    digitalWrite(PIN_COM, LOW);
   }
 
 }
@@ -114,6 +148,8 @@ void transmit(int weight) {
             return;
         }
     }
+
+    client.stop();
 //
 //    // Read all the lines of the reply from server and print them to Serial
 //    while(client.available()) {
