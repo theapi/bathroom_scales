@@ -223,23 +223,26 @@ int main(void)
             break;
 
         case TX_STATE_TRANSMITTING:
-            tx_state = TX_STATE_SLEEP;
-//            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
-//            if (radio == GPIO_PIN_SET) {
-//                /* Transmitter finished */
-//                tx_state = TX_STATE_SLEEP;
-//
-//
-//            } else {
-//                // send again
-//                //HAL_Delay(1000);
-//                //tx_state = TX_STATE_ON;
-//            }
+//            HAL_Delay(5000);
+//            tx_state = TX_STATE_SLEEP;
+            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+            if (radio == GPIO_PIN_SET) {
+                /* Transmitter finished */
+                tx_state = TX_STATE_SLEEP;
+
+
+            } else {
+                // send again
+                //HAL_Delay(1000);
+                //tx_state = TX_STATE_ON;
+            }
             break;
 
         case TX_STATE_SLEEP:
+
             /* Disable the uart */
                 HAL_UART_MspDeInit(&huart2);
+
             /* Turn off the transmitter */
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
             /* After standby, setup (main) is run again */
