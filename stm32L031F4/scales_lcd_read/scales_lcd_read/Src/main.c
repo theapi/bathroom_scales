@@ -231,8 +231,8 @@ int main(void)
 
             } else {
                 // send again
-                //HAL_Delay(1000);
-                //tx_state = TX_STATE_ON;
+                HAL_Delay(500);
+                tx_state = TX_STATE_ON;
             }
             break;
 

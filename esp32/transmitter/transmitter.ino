@@ -56,25 +56,22 @@ void loop() {
   // Listen for the lcd reader output.
   if (Serial1.available()) {
     byte c = Serial1.read();
+    // Passthru.
+    Serial.write(c);
 
-    // Transmit only once. The reader will then cut the power.
-    //if (tx == 0) {
-      // The weight reading starts with #
-      if (c == '#') {
-        rx_state = 1;
-        weight = 0;
-
-        
-        // Grab the weight
-        //int weight = Serial1.parseInt();
-        tx = 1;
-        
-        
-      } else if (rx_state == 1) {
+    switch (rx_state) {
+      case 0:
+        if (c == '#') {
+          rx_state = 1;
+          weight = 0;
+        }
+        break;
+      case 1:
         weight_byte_high = c;
         weight_byte_low = 0;
         rx_state = 2;
-      } else if (rx_state == 2) {
+        break;
+      case 2:
         weight_byte_low = c;
         weight = (weight_byte_high << 8) | weight_byte_low;
         //Serial1.end();
@@ -87,16 +84,12 @@ void loop() {
         digitalWrite(PIN_COM, HIGH);
         
         rx_state = 3;
-
-        // Break out of the serial loop
-        //continue;
-        
-      }
-      
-    //}
-
-    // Passthru the rest of the data.
-    Serial.write(c);
+        break;
+      case 3:
+        // wait for power down
+        break;
+    }
+    
   }
 
   unsigned long currentMillis = millis();
