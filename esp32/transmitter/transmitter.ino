@@ -13,6 +13,8 @@
 HardwareSerial Serial1(2);
 WiFiMulti wifiMulti;
 
+byte tx = 0;
+
 void setup() {
   // Slow down the cpu fora bit of power saving.
   rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
@@ -39,15 +41,20 @@ void loop() {
   // Listen for the lcd reader output.
   while (Serial1.available()) {
     byte c = Serial1.read();
-    // The weight reading starts with #
-    if (c == '#') {
-      // Grab the weight
-      int weight = Serial1.parseInt();
-      Serial.println(weight);
-      transmit(weight);
 
-      // Tell the reader the transmitter is finished.
-      digitalWrite(PIN_COM, LOW);
+    // Transmit only once. The reader will then cut the power.
+    if (tx == 0) {
+      // The weight reading starts with #
+      if (c == '#') {
+        // Grab the weight
+        int weight = Serial1.parseInt();
+        tx = 1;
+        Serial.println(weight);
+        transmit(weight);
+  
+        // Tell the reader the transmitter is finished.
+        digitalWrite(PIN_COM, LOW);
+      }
     }
 
     // Passthru the rest of the data.
