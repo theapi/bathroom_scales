@@ -10,6 +10,7 @@
 
 HardwareSerial Serial1(2);
 
+byte c = 0;
 byte tx = 0;
 int weight = 0;
 const char* host = "192.168.0.22";
@@ -27,8 +28,7 @@ void setup() {
   // Main usb serial for debug.
   Serial.begin(115200);
   
-  // Listen to the lcd reader.
-  Serial1.begin(57600);
+  
 
   delay(10);
 
@@ -43,6 +43,9 @@ void setup() {
         Serial.print(".");
     }
 
+  // Listen to the lcd reader.
+  Serial1.begin(9600);
+  
   Serial.println("Started on:");
   Serial.println(WiFi.localIP());
 
@@ -56,14 +59,17 @@ void loop() {
   // Listen for the lcd reader output.
   if (Serial1.available()) {
     byte c = Serial1.read();
+    
     // Passthru.
-    Serial.write(c);
+    Serial.print(c);
+
 
     switch (rx_state) {
       case 0:
         if (c == '#') {
           rx_state = 1;
           weight = 0;
+          
         }
         break;
       case 1:
@@ -74,8 +80,8 @@ void loop() {
       case 2:
         weight_byte_low = c;
         weight = (weight_byte_high << 8) | weight_byte_low;
-        //Serial1.end();
-        
+        //
+        tx = 1;
         Serial.println(weight);
         //
         transmit(weight);
@@ -83,18 +89,22 @@ void loop() {
         // Tell the reader the transmitter is finished.
         digitalWrite(PIN_COM, HIGH);
         
-        rx_state = 3;
-        break;
-      case 3:
-        // wait for power down
+        rx_state = 0;
         break;
     }
-    
+  }
+
+  if (tx == 1) {
+     //Serial1.end();
+     tx = 0;
+     Serial.println("End");
   }
 
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= timeout) {
+    Serial.println("Timeout");
+    
     previousMillis = currentMillis;
     // pretend power down
     digitalWrite(PIN_COM, HIGH);
@@ -102,6 +112,7 @@ void loop() {
     rx_state = 0;
 
     //Serial1.begin(57600);
+    Serial.println("start");
     delay(1000);
     digitalWrite(PIN_COM, LOW);
   }
@@ -141,7 +152,7 @@ void transmit(int weight) {
             return;
         }
     }
-
+    Serial.flush();
     client.stop();
 //
 //    // Read all the lines of the reply from server and print them to Serial

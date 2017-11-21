@@ -182,7 +182,7 @@ int main(void)
 
 
 
-            /* Got a messurement so initialise the tranmission. */
+            /* Got a measurement so initialise the tranmission. */
             tx_state = TX_STATE_SETUP;
             break;
 
@@ -223,17 +223,18 @@ int main(void)
             break;
 
         case TX_STATE_TRANSMITTING:
-            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
-            if (radio == GPIO_PIN_SET) {
-                /* Transmitter finished */
-                tx_state = TX_STATE_SLEEP;
-
-
-            } else {
-                // send again
-                HAL_Delay(500);
-                tx_state = TX_STATE_ON;
-            }
+            tx_state = TX_STATE_SLEEP;
+//            radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+//            if (radio == GPIO_PIN_SET) {
+//                /* Transmitter finished */
+//                tx_state = TX_STATE_SLEEP;
+//
+//
+//            } else {
+//                // send again
+//                //HAL_Delay(1000);
+//                //tx_state = TX_STATE_ON;
+//            }
             break;
 
         case TX_STATE_SLEEP:
