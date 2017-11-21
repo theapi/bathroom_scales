@@ -113,6 +113,9 @@ int main(void)
     HAL_PWREx_EnableUltraLowPower();
     //HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
 
+    /* Ensure the transmitter is on */
+          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+
     /* Buffer used for transmission on USART2 */
     char tx1_buffer[120];
     int count = 0;
@@ -131,12 +134,10 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-      /* The radio will pull this high when it is ready for the serial data */
-      uint8_t radio_on = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
-      if (radio_on) {
-          /* Configure and turn on the uart */
-          HAL_UART_MspInit(&huart2);
-      }
+
+
+
+
 
       //HAL_ADC_Start(&hadc);
       HAL_ADC_PollForConversion(&hadc, 100);
@@ -163,8 +164,14 @@ int main(void)
 
       uint16_t weight = 1234;
 
+      /* The radio will pull this high when it is ready for the serial data */
+      uint8_t radio_on = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+
       /* Only talk to the radio module if it is ready */
       if (radio_on) {
+          /* Configure and turn on the uart */
+          HAL_UART_MspInit(&huart2);
+
           sprintf(tx1_buffer,
                   "#%d, id:%d, com1:%u, radio: %d, pins:%s pin_values: %dxx%d%d%d%d%d%d%dx, idr: %s\n",
                   weight,
@@ -185,11 +192,15 @@ int main(void)
       count++;
 
       if (count > 10) {
+          HAL_Delay(2000);
+          /* Turn off the transmitter */
+          HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+          HAL_Delay(5000);
           /* After standby, setup (main) is run again */
           standby();
       }
 
-      HAL_Delay(1000);
+      HAL_Delay(2000);
 
   }
   /* USER CODE END 3 */
