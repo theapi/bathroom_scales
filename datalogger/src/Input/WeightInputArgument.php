@@ -23,7 +23,7 @@ class WeightInputArgument extends BaseInputArgument implements InputArgumentInte
     $options = [
       'options' => [
         'min_range' => 0,
-        'max_range' => 150,
+        'max_range' => 1500,
       ]
     ];
     if (filter_var($this->getValue(), FILTER_VALIDATE_INT, $options) === FALSE) {
