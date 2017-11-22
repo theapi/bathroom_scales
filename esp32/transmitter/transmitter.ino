@@ -6,7 +6,7 @@
 #include "credentials.h"
 
 #define PIN_COM  GPIO_NUM_21 // for basic communication with the lcd reader.
-
+#define BUTTON_PIN_BITMASK 0x400000000 // 2^34 pin 34
 
 HardwareSerial Serial1(2);
 
@@ -16,14 +16,14 @@ int weight = 0;
 const char* host = "192.168.0.22";
 
 unsigned long previousMillis = 0; 
-const long timeout = 10000; 
+const long timeout = 30000; 
 
 byte rx_state = 0;
 byte weight_byte_high = 0;
 byte weight_byte_low = 0;
 
 void setup() {
-
+  esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
     
   // Main usb serial for debug.
   Serial.begin(115200);
@@ -34,7 +34,7 @@ void setup() {
 
   pinMode(PIN_COM, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
+  
 
   WiFi.begin(WIFI_SID, WIFI_PASSWORD);
 
@@ -51,6 +51,7 @@ void setup() {
 
   // Tell the reader the transmitter is ready.
   digitalWrite(PIN_COM, LOW);
+  digitalWrite(LED_BUILTIN, HIGH);
 
 }
 
@@ -88,10 +89,13 @@ void loop() {
   
         // Tell the reader the transmitter is finished.
         digitalWrite(PIN_COM, HIGH);
-        
-        rx_state = 0;
+        delay(1000);
+        esp_deep_sleep_start();
         break;
     }
+  } else {
+   //Serial.println("no serial");
+    
   }
 
   if (tx == 1) {
@@ -106,6 +110,9 @@ void loop() {
     Serial.println("Timeout");
     
     previousMillis = currentMillis;
+
+    esp_deep_sleep_start();
+    
     // pretend power down
     digitalWrite(PIN_COM, HIGH);
     tx = 0;

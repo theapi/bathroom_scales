@@ -156,7 +156,7 @@ int main(void)
             // Do the measuring
 
 
-            HAL_Delay(10000);
+            //HAL_Delay(30000);
 
             //HAL_ADC_Start(&hadc);
             HAL_ADC_PollForConversion(&hadc, 100);
@@ -233,18 +233,23 @@ int main(void)
 
             } else {
                 // send again
-                //HAL_Delay(1000);
-                //tx_state = TX_STATE_ON;
+                HAL_Delay(1000);
+                tx_state = TX_STATE_ON;
             }
             break;
 
         case TX_STATE_SLEEP:
 
-            /* Disable the uart */
-                HAL_UART_MspDeInit(&huart2);
+
 
             /* Turn off the transmitter */
                 HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+
+
+                /* Disable the uart */
+                HAL_UART_MspDeInit(&huart2);
+
+                HAL_Delay(30000);
             /* After standby, setup (main) is run again */
             standby();
             break;
