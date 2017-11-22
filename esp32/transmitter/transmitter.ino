@@ -16,14 +16,15 @@ int weight = 0;
 const char* host = "192.168.0.22";
 
 unsigned long previousMillis = 0; 
-const long timeout = 30000; 
+const long timeout = 10000; 
 
 byte rx_state = 0;
 byte weight_byte_high = 0;
 byte weight_byte_low = 0;
 
 void setup() {
-  esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
+  //esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK,ESP_EXT1_WAKEUP_ANY_HIGH);
+  // No wake up. #
     
   // Main usb serial for debug.
   Serial.begin(115200);
@@ -90,6 +91,7 @@ void loop() {
         // Tell the reader the transmitter is finished.
         digitalWrite(PIN_COM, HIGH);
         delay(1000);
+        digitalWrite(LED_BUILTIN, LOW);
         esp_deep_sleep_start();
         break;
     }
@@ -98,11 +100,11 @@ void loop() {
     
   }
 
-  if (tx == 1) {
-     //Serial1.end();
-     tx = 0;
-     Serial.println("End");
-  }
+//  if (tx == 1) {
+//     //Serial1.end();
+//     tx = 0;
+//     Serial.println("End");
+//  }
 
   unsigned long currentMillis = millis();
 
@@ -111,17 +113,19 @@ void loop() {
     
     previousMillis = currentMillis;
 
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(PIN_COM, LOW);
     esp_deep_sleep_start();
     
-    // pretend power down
-    digitalWrite(PIN_COM, HIGH);
-    tx = 0;
-    rx_state = 0;
-
-    //Serial1.begin(57600);
-    Serial.println("start");
-    delay(1000);
-    digitalWrite(PIN_COM, LOW);
+//    // pretend power down
+//    digitalWrite(PIN_COM, HIGH);
+//    tx = 0;
+//    rx_state = 0;
+//
+//    //Serial1.begin(57600);
+//    Serial.println("start");
+//    delay(1000);
+//    digitalWrite(PIN_COM, LOW);
   }
 
 }
