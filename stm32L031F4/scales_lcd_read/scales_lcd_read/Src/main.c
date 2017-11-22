@@ -249,7 +249,7 @@ int main(void)
                 /* Disable the uart */
                 HAL_UART_MspDeInit(&huart2);
 
-                HAL_Delay(30000);
+                HAL_Delay(60000);
             /* After standby, setup (main) is run again */
             standby();
             break;
