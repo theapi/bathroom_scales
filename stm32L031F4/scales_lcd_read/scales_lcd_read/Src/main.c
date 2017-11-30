@@ -47,6 +47,7 @@
 #include "string.h"
 #include "stdlib.h"
 #include "lcd.h"
+#include "tx.h"
 
 /* USER CODE END Includes */
 
