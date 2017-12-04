@@ -46,8 +46,10 @@
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "stdlib.h"
+
 #include "lcd.h"
 #include "tx.h"
+#include "scales.h"
 
 /* USER CODE END Includes */
 

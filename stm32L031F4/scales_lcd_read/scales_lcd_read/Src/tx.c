@@ -1,5 +1,6 @@
 
 #include "tx.h"
+#include "scales.h"
 
 TXState_TypeDef TX_StateMachineRun(TXState_TypeDef state) {
     switch (state) {
