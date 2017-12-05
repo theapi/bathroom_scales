@@ -26,7 +26,23 @@ uint8_t LCD_getPinValues(void) {
  * Check COM0 for a high to indicate the start of the frame.
  */
 uint8_t LCD_frameStart(void) {
+    uint8_t start = 0;
 
+    HAL_ADC_PollForConversion(&hadc, 100);
+    uint32_t com = HAL_ADC_GetValue(&hadc);
+    if (com > LCD_COM_HIGH) {
+        // Wait for overshoot to settle.
+        HAL_Delay(2);
+
+        // If it's still high then we have the real com pulse.
+        HAL_ADC_PollForConversion(&hadc, 100);
+        com = HAL_ADC_GetValue(&hadc);
+        if (com > LCD_COM_HIGH) {
+          start = 1;
+        }
+    }
+
+    return start;
 }
 
 /**
@@ -122,7 +138,30 @@ uint8_t LCD_digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_p
     return segmentsAsNumber(segs);
 }
 
-void LCD_read(void) {
+uint8_t LCD_read(void) {
+    uint8_t reading = 0;
 
+    if (LCD_frameStart() == 1) {
+        /* Read the pin state while on COM0, then wait for the next COM */
+        lcd.pins_com0 = LCD_getPinValues();
+        HAL_Delay(LCD_DELAY_BETWEEN_COMS);
+
+        /* Read the pin state while on COM1, then wait for the next COM */
+        lcd.pins_com1 = LCD_getPinValues();
+        HAL_Delay(LCD_DELAY_BETWEEN_COMS);
+
+        /* Read the pin state while on COM2, then wait for the next COM */
+        lcd.pins_com2 = LCD_getPinValues();
+        HAL_Delay(LCD_DELAY_BETWEEN_COMS);
+
+        /* Read the pin state while on COM3, then wait for the next COM */
+        lcd.pins_com3 = LCD_getPinValues();
+        HAL_Delay(LCD_DELAY_BETWEEN_COMS);
+
+        /* A new reading has been collected. */
+        reading = 1;
+    }
+
+    return reading;
 }
 

@@ -10,6 +10,23 @@ extern "C" {
 #include "main.h"
 #include "stdint.h"
 
+#define LCD_COM_HIGH 3300 // The analog reading that indicates active on the com line.
+#define LCD_DELAY_BETWEEN_COMS 4 // How long before the next com is ready for reading.
+
+/**
+  * @brief Scales_TypeDef
+  */
+typedef struct
+{
+    uint8_t pins_com0;
+    uint8_t pins_com1;
+    uint8_t pins_com2;
+    uint8_t pins_com3;
+} LCD_TypeDef;
+
+
+extern LCD_TypeDef lcd;
+
 /**
  * Get the current pin values.
  */
@@ -52,7 +69,7 @@ uint8_t LCD_digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_p
  */
 uint8_t LCD_digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins);
 
-void LCD_read(void);
+uint8_t LCD_read(void);
 
 #ifdef __cplusplus
 }
