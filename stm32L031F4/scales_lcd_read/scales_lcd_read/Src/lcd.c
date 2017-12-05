@@ -70,8 +70,8 @@ uint8_t LCD_segmentsAsNumber(uint8_t segs) {
  * Get the active segments for a digit.
  * Each digit uses only 2 pins.
  */
-uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2,
-        uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2, uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
+        uint16_t com0_pins) {
 
       uint8_t segs = 0;
       // Place the value for the pins as segments.
@@ -107,8 +107,8 @@ uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2,
  */
 uint8_t LCD_digitDecode0(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
     // Digit zero is pins 5 & 6.
-    uint8_t segs = getSegmentsForDigit(5, 6, com3_pins, com2_pins, com1_pins, com0_pins);
-    return segmentsAsNumber(segs);
+    uint8_t segs = LCD_getSegmentsForDigit(5, 6, com3_pins, com2_pins, com1_pins, com0_pins);
+    return LCD_segmentsAsNumber(segs);
 }
 
 /**
@@ -116,8 +116,8 @@ uint8_t LCD_digitDecode0(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_p
  */
 uint8_t LCD_digitDecode1(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
     // Digit zero is pins 7 & 8.
-    uint8_t segs = getSegmentsForDigit(7, 8, com3_pins, com2_pins, com1_pins, com0_pins);
-    return segmentsAsNumber(segs);
+    uint8_t segs = LCD_getSegmentsForDigit(7, 8, com3_pins, com2_pins, com1_pins, com0_pins);
+    return LCD_segmentsAsNumber(segs);
 }
 
 /**
@@ -125,8 +125,8 @@ uint8_t LCD_digitDecode1(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_p
  */
 uint8_t LCD_digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
     // Digit zero is pins 9 & 10.
-    uint8_t segs = getSegmentsForDigit(9, 10, com3_pins, com2_pins, com1_pins, com0_pins);
-    return segmentsAsNumber(segs);
+    uint8_t segs = LCD_getSegmentsForDigit(9, 10, com3_pins, com2_pins, com1_pins, com0_pins);
+    return LCD_segmentsAsNumber(segs);
 }
 
 /**
@@ -134,28 +134,28 @@ uint8_t LCD_digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_p
  */
 uint8_t LCD_digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
     // Digit zero is pins 11 & 12.
-    uint8_t segs = getSegmentsForDigit(11, 12, com3_pins, com2_pins, com1_pins, com0_pins);
-    return segmentsAsNumber(segs);
+    uint8_t segs = LCD_getSegmentsForDigit(11, 12, com3_pins, com2_pins, com1_pins, com0_pins);
+    return LCD_segmentsAsNumber(segs);
 }
 
-uint8_t LCD_read(void) {
+uint8_t LCD_read(LCD_TypeDef *lcd) {
     uint8_t reading = 0;
 
     if (LCD_frameStart() == 1) {
         /* Read the pin state while on COM0, then wait for the next COM */
-        lcd.pins_com0 = LCD_getPinValues();
+        lcd->pins_com0 = LCD_getPinValues();
         HAL_Delay(LCD_DELAY_BETWEEN_COMS);
 
         /* Read the pin state while on COM1, then wait for the next COM */
-        lcd.pins_com1 = LCD_getPinValues();
+        lcd->pins_com1 = LCD_getPinValues();
         HAL_Delay(LCD_DELAY_BETWEEN_COMS);
 
         /* Read the pin state while on COM2, then wait for the next COM */
-        lcd.pins_com2 = LCD_getPinValues();
+        lcd->pins_com2 = LCD_getPinValues();
         HAL_Delay(LCD_DELAY_BETWEEN_COMS);
 
         /* Read the pin state while on COM3, then wait for the next COM */
-        lcd.pins_com3 = LCD_getPinValues();
+        lcd->pins_com3 = LCD_getPinValues();
         HAL_Delay(LCD_DELAY_BETWEEN_COMS);
 
         /* A new reading has been collected. */
@@ -164,4 +164,23 @@ uint8_t LCD_read(void) {
 
     return reading;
 }
+
+void LCD_run(LCD_TypeDef *lcd) {
+    uint16_t now = HAL_GetTick();
+    uint16_t value = 0;
+
+    if (now - lcd->last_reading_time >= LCD_READ_INTERVAL) {
+        lcd->last_reading_time = now;
+
+        value = LCD_read(lcd);
+        if (value == 0) {
+            /* Cause another reading to happen. */
+            lcd->last_reading_time = 0;
+            return;
+        } else {
+
+        }
+    }
+}
+
 
