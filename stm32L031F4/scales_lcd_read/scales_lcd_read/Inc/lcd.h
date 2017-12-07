@@ -31,8 +31,13 @@ typedef struct {
     uint8_t pins_com1;
     uint8_t pins_com2;
     uint8_t pins_com3;
+    uint8_t digit0;
+    uint8_t digit1;
+    uint8_t digit2;
+    uint8_t digit3;
     uint8_t same_count;
-    uint16_t last_reading_value;
+    uint16_t weight;
+    uint16_t last_weight;
     uint16_t last_reading_time;
 } LCD_TypeDef;
 
@@ -59,32 +64,35 @@ uint8_t LCD_segmentsAsNumber(uint8_t segs);
  * Get the active segments for a digit.
  * Each digit uses only 2 pins.
  */
-uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2, uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
-        uint16_t com0_pins);
+uint8_t LCD_getSegmentsForDigit(LCD_TypeDef *lcd, uint8_t pin1, uint8_t pin2);
 
 /**
  * The value on the screen for digit zero.
  */
-uint8_t LCD_digitDecode0(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins);
+void LCD_digitDecode0(LCD_TypeDef *lcd);
 
 /**
  * The value on the screen for digit one.
  */
-uint8_t LCD_digitDecode1(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins);
+uint8_t LCD_digitDecode1(LCD_TypeDef *lcd);
 
 /**
  * The value on the screen for digit 2.
  */
-uint8_t LCD_digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins);
+uint8_t LCD_digitDecode2(LCD_TypeDef *lcd);
 
 /**
  * The value on the screen for digit 3.
  */
-uint8_t LCD_digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins);
+uint8_t LCD_digitDecode3(LCD_TypeDef *lcd);
 
 uint8_t LCD_read(LCD_TypeDef *lcd);
 
 void LCD_run(LCD_TypeDef *lcd);
+
+void LCD_decodeDigits(LCD_TypeDef *lcd);
+
+void LCD_int(LCD_TypeDef *lcd);
 
 #ifdef __cplusplus
 }

@@ -139,6 +139,8 @@ int main(void)
     HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED);
     HAL_ADC_Start(&hadc);
 
+    LCD_int(&lcd);
+
 //    uint32_t com1 = 0;
 //    uint16_t weight = 1234;
 //    uint8_t pins = 0;

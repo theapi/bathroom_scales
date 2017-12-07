@@ -1,6 +1,21 @@
 #include "lcd.h"
 #include "bit.h"
 
+void LCD_int(LCD_TypeDef *lcd) {
+    lcd->pins_com0 = 0;
+    lcd->pins_com1 = 0;
+    lcd->pins_com2 = 0;
+    lcd->pins_com3 = 0;
+    lcd->digit0 = 11;
+    lcd->digit1 = 11;
+    lcd->digit2 = 11;
+    lcd->digit3 = 11;
+    lcd->same_count = 0;
+    lcd->weight = 0;
+    lcd->last_weight = 0;
+    lcd->last_reading_time = 0;
+}
+
 /**
  * Get the current pin values.
  */
@@ -70,8 +85,7 @@ uint8_t LCD_segmentsAsNumber(uint8_t segs) {
  * Get the active segments for a digit.
  * Each digit uses only 2 pins.
  */
-uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2, uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins,
-        uint16_t com0_pins) {
+uint8_t LCD_getSegmentsForDigit(LCD_TypeDef *lcd, uint8_t pin1, uint8_t pin2) {
 
       uint8_t segs = 0;
       // Place the value for the pins as segments.
@@ -80,24 +94,24 @@ uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2, uint16_t com3_pins, 
       // dots colons etc are ignored
 
       // COM0:pin1 = A
-      bitWrite(segs, 0, bitRead(com0_pins, pin1));
+      bitWrite(segs, 0, bitRead(lcd->pins_com0, pin1));
       // COM0:pin2 = F
-      bitWrite(segs, 5, bitRead(com0_pins, pin2));
+      bitWrite(segs, 5, bitRead(lcd->pins_com0, pin2));
 
       // COM1:pin1 = B
-      bitWrite(segs, 1, bitRead(com1_pins, pin1));
+      bitWrite(segs, 1, bitRead(lcd->pins_com1, pin1));
       // COM1:pin2 = G
-      bitWrite(segs, 6, bitRead(com1_pins, pin2));
+      bitWrite(segs, 6, bitRead(lcd->pins_com1, pin2));
 
       // COM2:pin1 = C
-      bitWrite(segs, 2, bitRead(com2_pins, pin1));
+      bitWrite(segs, 2, bitRead(lcd->pins_com2, pin1));
       // COM2:pin2 = E
-      bitWrite(segs, 4, bitRead(com2_pins, pin2));
+      bitWrite(segs, 4, bitRead(lcd->pins_com2, pin2));
 
       // COM3:5 = St
       // ignore
       // COM3:pin2 = D
-      bitWrite(segs, 3, bitRead(com3_pins, pin2));
+      bitWrite(segs, 3, bitRead(lcd->pins_com3, pin2));
 
       return segs;
 }
@@ -105,37 +119,44 @@ uint8_t LCD_getSegmentsForDigit(uint8_t pin1, uint8_t pin2, uint16_t com3_pins, 
 /**
  * The value on the screen for digit zero.
  */
-uint8_t LCD_digitDecode0(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+void LCD_digitDecode0(LCD_TypeDef *lcd) {
     // Digit zero is pins 5 & 6.
-    uint8_t segs = LCD_getSegmentsForDigit(5, 6, com3_pins, com2_pins, com1_pins, com0_pins);
-    return LCD_segmentsAsNumber(segs);
+    uint8_t segs = LCD_getSegmentsForDigit(lcd, 5, 6);
+    lcd->digit0 = LCD_segmentsAsNumber(segs);
 }
 
 /**
  * The value on the screen for digit one.
  */
-uint8_t LCD_digitDecode1(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+uint8_t LCD_digitDecode1(LCD_TypeDef *lcd) {
     // Digit zero is pins 7 & 8.
-    uint8_t segs = LCD_getSegmentsForDigit(7, 8, com3_pins, com2_pins, com1_pins, com0_pins);
+    uint8_t segs = LCD_getSegmentsForDigit(lcd, 7, 8);
     return LCD_segmentsAsNumber(segs);
 }
 
 /**
  * The value on the screen for digit 2.
  */
-uint8_t LCD_digitDecode2(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+uint8_t LCD_digitDecode2(LCD_TypeDef *lcd) {
     // Digit zero is pins 9 & 10.
-    uint8_t segs = LCD_getSegmentsForDigit(9, 10, com3_pins, com2_pins, com1_pins, com0_pins);
+    uint8_t segs = LCD_getSegmentsForDigit(lcd, 9, 10);
     return LCD_segmentsAsNumber(segs);
 }
 
 /**
  * The value on the screen for digit 3.
  */
-uint8_t LCD_digitDecode3(uint16_t com3_pins, uint16_t com2_pins, uint16_t com1_pins, uint16_t com0_pins) {
+uint8_t LCD_digitDecode3(LCD_TypeDef *lcd) {
     // Digit zero is pins 11 & 12.
-    uint8_t segs = LCD_getSegmentsForDigit(11, 12, com3_pins, com2_pins, com1_pins, com0_pins);
+    uint8_t segs = LCD_getSegmentsForDigit(lcd, 11, 12);
     return LCD_segmentsAsNumber(segs);
+}
+
+void LCD_decodeDigits(LCD_TypeDef *lcd) {
+    LCD_digitDecode0(lcd);
+    LCD_digitDecode1(lcd);
+    LCD_digitDecode2(lcd);
+    LCD_digitDecode3(lcd);
 }
 
 uint8_t LCD_read(LCD_TypeDef *lcd) {
@@ -178,7 +199,18 @@ void LCD_run(LCD_TypeDef *lcd) {
             lcd->last_reading_time = 0;
             return;
         } else {
+            LCD_decodeDigits(lcd);
 
+            // The ones digit has a value.
+            if (lcd->digit1 != 11) {
+                lcd->weight = (lcd->digit3 * 1000) + (lcd->digit2 * 100) + (lcd->digit1 * 10) + lcd->digit0;
+                if (lcd->last_weight == lcd->weight) {
+                    lcd->same_count++;
+
+                    //@todo...
+
+                }
+            }
         }
     }
 }
