@@ -22,6 +22,10 @@ extern "C" {
  * How long to wait between lcd reads.
  */
 #define LCD_READ_INTERVAL 250
+/**
+ * How many times the reading is the same to qualify as the steady weight.
+ */
+#define LCD_SAME_COUNT 32
 
 /**
  * @brief Scales_TypeDef
@@ -88,7 +92,7 @@ uint8_t LCD_digitDecode3(LCD_TypeDef *lcd);
 
 uint8_t LCD_read(LCD_TypeDef *lcd);
 
-void LCD_run(LCD_TypeDef *lcd);
+void LCD_run(LCD_TypeDef *lcd, UART_HandleTypeDef *huart2);
 
 void LCD_decodeDigits(LCD_TypeDef *lcd);
 

@@ -1,4 +1,5 @@
 #include "lcd.h"
+#include "tx.h"
 #include "bit.h"
 
 void LCD_int(LCD_TypeDef *lcd) {
@@ -186,31 +187,59 @@ uint8_t LCD_read(LCD_TypeDef *lcd) {
     return reading;
 }
 
-void LCD_run(LCD_TypeDef *lcd) {
+void LCD_run(LCD_TypeDef *lcd, UART_HandleTypeDef *huart2) {
+    static TXState_TypeDef tx_state = TXSTATE_OFF;
+
     uint16_t now = HAL_GetTick();
     uint16_t value = 0;
 
-    if (now - lcd->last_reading_time >= LCD_READ_INTERVAL) {
-        lcd->last_reading_time = now;
+    if (tx_state == TXSTATE_OFF) {
+        /* Weight for a valid weight reading */
+        if (now - lcd->last_reading_time >= LCD_READ_INTERVAL) {
+            lcd->last_reading_time = now;
 
-        value = LCD_read(lcd);
-        if (value == 0) {
-            /* Cause another reading to happen. */
-            lcd->last_reading_time = 0;
-            return;
-        } else {
-            LCD_decodeDigits(lcd);
+            value = LCD_read(lcd);
+            if (value == 0) {
+                /* Cause another reading to happen. */
+                lcd->last_reading_time = 0;
+                return;
+            } else {
+                LCD_decodeDigits(lcd);
 
-            // The ones digit has a value.
-            if (lcd->digit1 != 11) {
-                lcd->weight = (lcd->digit3 * 1000) + (lcd->digit2 * 100) + (lcd->digit1 * 10) + lcd->digit0;
-                if (lcd->last_weight == lcd->weight) {
-                    lcd->same_count++;
+                // The ones digit has a value.
+                if (lcd->digit1 != 11) {
+                    lcd->weight = (lcd->digit3 * 1000) + (lcd->digit2 * 100) + (lcd->digit1 * 10) + lcd->digit0;
 
-                    //@todo...
+                    if (lcd->last_weight == lcd->weight) {
+                        lcd->same_count++;
 
+                        /* Got enough readings the same to qualify as the reading */
+                        if (lcd->same_count > LCD_SAME_COUNT) {
+                            lcd->same_count = 0;
+
+                            /* Send to the transmitter */
+                            tx_state = TXSTATE_SETUP;
+                        }
+
+                    } else {
+                        /* Different weight value than before */
+                        lcd->same_count = 0;
+                    }
+                    lcd->last_weight = lcd->weight;
+                } else {
+                    /* Not a real value */
+                    lcd->last_weight = 0;
                 }
+
             }
+        }
+    } else {
+        /* Run the transmission state machine */
+        tx_state = TX_StateMachineRun(tx_state);
+
+        /* Very deep sleep when done */
+        if (tx_state == TXSTATE_COMPLETE) {
+            //@todo...
         }
     }
 }
