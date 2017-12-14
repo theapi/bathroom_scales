@@ -47,9 +47,9 @@
 #include "string.h"
 #include "stdlib.h"
 
-#include "lcd.h"
-#include "tx.h"
-#include "scales.h"
+//#include "lcd.h"
+//#include "tx.h"
+//#include "scales.h"
 
 /* USER CODE END Includes */
 
@@ -153,6 +153,12 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
+//      HAL_Delay(1000);
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+//      HAL_Delay(1000);
+//      tx_state = 150;
+
 
       switch (tx_state) {
         case TX_STATE_OFF:
@@ -182,26 +188,42 @@ int main(void)
 
             pins = LCD_getPinValues();
 
-
-
-
-            /* Got a measurement so initialise the tranmission. */
             tx_state = TX_STATE_SETUP;
+
             break;
 
         case TX_STATE_SETUP:
             /* Turn on the transmitter */
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
             tx_state = TX_STATE_INIT;
+
+
+
+
+
+//            HAL_Delay(1000);
+//            tx_state = TX_STATE_SLEEP;
+
+
+
+
+
             break;
 
         case TX_STATE_INIT:
             /* Wait for the transmitter to turn on */
-            /* The radio will pull this high when it is ready for the serial data */
+            /* The radio will pull this low when it is ready for the serial data */
             radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
             if (radio == GPIO_PIN_RESET) {
                 tx_state = TX_STATE_ON;
             }
+
+
+
+            tx_state = TX_STATE_ON;
+
+
+
             break;
 
         case TX_STATE_ON:
@@ -228,6 +250,8 @@ int main(void)
         case TX_STATE_TRANSMITTING:
 //            HAL_Delay(5000);
 //            tx_state = TX_STATE_SLEEP;
+
+
             radio = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
             if (radio == GPIO_PIN_SET) {
                 /* Transmitter finished */
@@ -252,7 +276,8 @@ int main(void)
                 /* Disable the uart */
                 HAL_UART_MspDeInit(&huart2);
 
-                HAL_Delay(60000);
+                HAL_Delay(5000);
+                tx_state = TX_STATE_OFF;
             /* After standby, setup (main) is run again */
             standby();
             break;
@@ -263,6 +288,8 @@ int main(void)
 
 
   }
+
+
   /* USER CODE END 3 */
 
 }

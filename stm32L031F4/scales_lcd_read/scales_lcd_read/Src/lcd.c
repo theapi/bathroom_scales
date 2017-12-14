@@ -28,19 +28,7 @@ uint8_t LCD_getPinValues(void) {
 uint8_t LCD_frameStart(void) {
     uint8_t start = 0;
 
-    HAL_ADC_PollForConversion(&hadc, 100);
-    uint32_t com = HAL_ADC_GetValue(&hadc);
-    if (com > LCD_COM_HIGH) {
-        // Wait for overshoot to settle.
-        HAL_Delay(2);
 
-        // If it's still high then we have the real com pulse.
-        HAL_ADC_PollForConversion(&hadc, 100);
-        com = HAL_ADC_GetValue(&hadc);
-        if (com > LCD_COM_HIGH) {
-          start = 1;
-        }
-    }
 
     return start;
 }
