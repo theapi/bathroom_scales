@@ -76,6 +76,8 @@ TXState_TypeDef tx_state = TXSTATE_OFF;
 
 LCD_TypeDef lcd;
 
+uint16_t value = 0;
+
 /* USER CODE END 0 */
 
 int main(void)
@@ -129,6 +131,10 @@ int main(void)
 
   LCD_int(&lcd);
 
+  /* Buffer used for transmission on USART2 */
+  char tx_buffer[120];
+  int count = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -139,21 +145,19 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-      /* Wait for a weight */
-      if (tx_state == TXSTATE_OFF) {
-          if (LCD_pollForWeight(&lcd) == 1) {
-              tx_state = TXSTATE_SETUP;
-          }
-      }
+    if (LCD_frameStart() == 1) {
+      value = LCD_read(&lcd);
 
-      /* Send the weight reading to the transmitter */
-      tx_state = TX_StateMachineRun(tx_state, &huart2, &lcd);
+      sprintf(tx_buffer,
+        "id:%d, value: %d, pins_com0:%d, pins_com1:%d, pins_com2:%d, pins_com3:%d\n",
+        ++count,
+        value,
+        lcd.pins_com0, lcd.pins_com1, lcd.pins_com2, lcd.pins_com3
+      );
 
-      /* Nothing left to do, just power down */
-      if (tx_state == TXSTATE_COMPLETE) {
-          /* After standby, setup (main) is run again */
-          standby();
-      }
+      HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+      HAL_Delay(250);
+    }
 
   }
   /* USER CODE END 3 */
