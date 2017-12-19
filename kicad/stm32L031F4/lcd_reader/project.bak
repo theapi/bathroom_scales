@@ -271,7 +271,7 @@ Text GLabel 4075 5050 2    60   Input ~ 0
 IN7
 Text GLabel 4075 5475 2    60   Input ~ 0
 IN8
-Text GLabel 1475 3850 2    60   Input ~ 0
+Text GLabel 1475 5350 2    60   Input ~ 0
 COM1
 Text GLabel 8575 5350 0    60   Input ~ 0
 RADIO_PWR
@@ -571,17 +571,17 @@ F 1 "CONN_01X16" V 1375 4600 50  0000 C CNN
 F 2 "theapi:ZEBRA-16" H 1275 4600 50  0001 C CNN
 F 3 "" H 1275 4600 50  0001 C CNN
 	1    1275 4600
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
-Text Label 1800 3950 0    60   ~ 0
+Text Label 1475 5050 0    60   ~ 0
 COM2
-NoConn ~ 1800 3950
-Text Label 1800 4050 0    60   ~ 0
+NoConn ~ 1475 5050
+Text Label 1475 5150 0    60   ~ 0
 COM3
-Text Label 1800 4150 0    60   ~ 0
+Text Label 1475 5250 0    60   ~ 0
 COM4
-NoConn ~ 1800 4050
-NoConn ~ 1800 4150
+NoConn ~ 1475 5150
+NoConn ~ 1475 5250
 $Comp
 L +BATT #PWR016
 U 1 1 5A03249C
@@ -617,8 +617,6 @@ Wire Wire Line
 Wire Wire Line
 	9700 4750 9700 4025
 Wire Wire Line
-	9400 5350 8875 5350
-Wire Wire Line
 	9700 5350 9700 5500
 Wire Wire Line
 	9500 5350 9700 5350
@@ -627,12 +625,6 @@ Wire Wire Line
 	9400 4750 9700 4750
 Connection ~ 9600 4750
 Connection ~ 9500 4750
-Wire Wire Line
-	1800 3950 1475 3950
-Wire Wire Line
-	1475 4050 1800 4050
-Wire Wire Line
-	1475 4150 1800 4150
 Wire Wire Line
 	3175 2250 2125 2250
 Wire Wire Line
@@ -673,12 +665,12 @@ Wire Wire Line
 	2425 5475 2425 4950
 Wire Wire Line
 	2425 4950 1475 4950
-NoConn ~ 1475 5050
-NoConn ~ 1475 5150
-NoConn ~ 1475 5250
-NoConn ~ 1475 5350
-Text Notes 1575 5250 0    39   ~ 0
-These pins are \nfor imperial readings
+NoConn ~ 1475 3850
+NoConn ~ 1475 3950
+NoConn ~ 1475 4050
+NoConn ~ 1475 4150
+Text Notes 1575 4075 0    39   ~ 0
+These pins are \nfor imperial\nreadings
 Wire Wire Line
 	3175 4650 2500 4650
 Wire Wire Line
@@ -739,4 +731,29 @@ Wire Wire Line
 	3575 1875 3575 2150
 Wire Wire Line
 	3575 3875 3575 4150
+$Comp
+L R R?
+U 1 1 5A38EF65
+P 9025 5500
+F 0 "R?" V 9105 5500 50  0000 C CNN
+F 1 "10K" V 9025 5500 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 8955 5500 50  0001 C CNN
+F 3 "" H 9025 5500 50  0001 C CNN
+	1    9025 5500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8875 5350 9400 5350
+Connection ~ 9025 5350
+$Comp
+L GND #PWR?
+U 1 1 5A38F119
+P 9025 5650
+F 0 "#PWR?" H 9025 5400 50  0001 C CNN
+F 1 "GND" H 9025 5500 50  0000 C CNN
+F 2 "" H 9025 5650 50  0001 C CNN
+F 3 "" H 9025 5650 50  0001 C CNN
+	1    9025 5650
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
