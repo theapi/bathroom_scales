@@ -31,18 +31,18 @@ extern "C" {
  * @brief Scales_TypeDef
  */
 typedef struct {
-    uint8_t pins_com0;
-    uint8_t pins_com1;
-    uint8_t pins_com2;
-    uint8_t pins_com3;
-    uint8_t digit0;
-    uint8_t digit1;
-    uint8_t digit2;
-    uint8_t digit3;
-    uint8_t same_count;
-    uint16_t weight;
-    uint16_t last_weight;
-    uint16_t last_reading_time;
+  uint8_t pins_com0;
+  uint8_t pins_com1;
+  uint8_t pins_com2;
+  uint8_t pins_com3;
+  uint8_t digit0;
+  uint8_t digit1;
+  uint8_t digit2;
+  uint8_t digit3;
+  uint8_t same_count;
+  uint16_t weight;
+  uint16_t last_weight;
+  uint16_t last_reading_time;
 } LCD_TypeDef;
 
 //extern LCD_TypeDef lcd;

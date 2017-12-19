@@ -10,13 +10,13 @@ extern "C" {
 #include "lcd.h"
 
 typedef enum {
-    TXSTATE_OFF,
-    TXSTATE_SETUP,
-    TXSTATE_STARTING,
-    TXSTATE_ON,
-    TXSTATE_TRANSMITTING,
-    TXSTATE_SENT,
-    TXSTATE_COMPLETE,
+  TXSTATE_OFF,
+  TXSTATE_SETUP,
+  TXSTATE_STARTING,
+  TXSTATE_ON,
+  TXSTATE_TRANSMITTING,
+  TXSTATE_SENT,
+  TXSTATE_COMPLETE,
 } TXState_TypeDef;
 
 TXState_TypeDef TX_StateMachineRun(TXState_TypeDef, UART_HandleTypeDef *huart2, LCD_TypeDef *lcd);
