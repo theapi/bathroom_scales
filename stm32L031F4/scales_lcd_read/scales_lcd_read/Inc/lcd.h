@@ -92,7 +92,7 @@ uint8_t LCD_digitDecode3(LCD_TypeDef *lcd);
 
 uint8_t LCD_read(LCD_TypeDef *lcd);
 
-void LCD_run(LCD_TypeDef *lcd, UART_HandleTypeDef *huart2);
+uint8_t LCD_pollForWeight(LCD_TypeDef *lcd);
 
 void LCD_decodeDigits(LCD_TypeDef *lcd);
 
