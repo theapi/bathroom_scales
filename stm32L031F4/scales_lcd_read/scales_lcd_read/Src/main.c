@@ -111,7 +111,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* Disable the uart for now */
-  HAL_UART_MspDeInit(&huart2);
+  //HAL_UART_MspDeInit(&huart2);
 
   /* Check if the system was resumed from Standby mode */
   if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
@@ -132,7 +132,7 @@ int main(void)
   LCD_int(&lcd);
 
   /* Buffer used for transmission on USART2 */
-  char tx_buffer[120];
+  char tx_buffer[255];
   int count = 0;
 
   /* USER CODE END 2 */
@@ -145,19 +145,70 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-    if (LCD_frameStart() == 1) {
-      value = LCD_read(&lcd);
+    if (LCD_read(&lcd)) {
+
+      LCD_decodeDigits(&lcd);
+
+      char pins_com0_str[33];
+      itoa (lcd.pins_com0, pins_com0_str, 2);
+
+      char pins_com1_str[33];
+      itoa (lcd.pins_com1, pins_com1_str, 2);
+
+      char pins_com2_str[33];
+      itoa (lcd.pins_com2, pins_com2_str, 2);
+
+      char pins_com3_str[33];
+      itoa (lcd.pins_com3, pins_com3_str, 2);
 
       sprintf(tx_buffer,
-        "id:%d, value: %d, pins_com0:%d, pins_com1:%d, pins_com2:%d, pins_com3:%d\n",
+        "id:%d, digit3: %d, digit2: %d, digit1: %d, digit0: %d \ncom0: %s, com1: %s, com2: %s, com3: %s\n",
         ++count,
-        value,
-        lcd.pins_com0, lcd.pins_com1, lcd.pins_com2, lcd.pins_com3
+        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0,
+        pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
       );
 
       HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
-      HAL_Delay(250);
+      HAL_Delay(2000);
+
     }
+
+//    if (LCD_frameStart() == 1) {
+//
+//      LCD_read(&lcd);
+//
+//      char pins_com0_str[33];
+//      itoa (lcd.pins_com0, pins_com0_str, 2);
+//
+//      char pins_com1_str[33];
+//      itoa (lcd.pins_com1, pins_com1_str, 2);
+//
+//      char pins_com2_str[33];
+//      itoa (lcd.pins_com2, pins_com2_str, 2);
+//
+//      char pins_com3_str[33];
+//      itoa (lcd.pins_com3, pins_com3_str, 2);
+//
+//      sprintf(tx_buffer,
+//          "id:%d, com0: %s, com1: %s, com2: %s, com3: %s\n",
+//          ++count,
+//          pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
+//       );
+//
+//      HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+//      HAL_Delay(2000);
+//    }
+
+
+//    uint8_t pin_values = LCD_getPinValues();
+//    char pin_values_str[33];
+//    itoa (pin_values, pin_values_str, 2);
+//    sprintf(tx_buffer, "id:%d, pins: %s, hex: %X\n", ++count, pin_values_str, pin_values);
+//    HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+
+
+
+    //HAL_Delay(2000);
 
   }
   /* USER CODE END 3 */
