@@ -13,7 +13,7 @@ extern "C" {
 /**
  * The analog reading that indicates active on the com line.
  */
-#define LCD_COM_HIGH 3300
+#define LCD_COM_HIGH 800
 /**
  * How long before the next com is ready for reading.
  */
@@ -48,6 +48,7 @@ typedef struct {
 //extern LCD_TypeDef lcd;
 
 extern ADC_HandleTypeDef hadc;
+extern UART_HandleTypeDef huart2;
 
 /**
  * Get the current pin values.
@@ -78,17 +79,17 @@ void LCD_digitDecode0(LCD_TypeDef *lcd);
 /**
  * The value on the screen for digit one.
  */
-uint8_t LCD_digitDecode1(LCD_TypeDef *lcd);
+void LCD_digitDecode1(LCD_TypeDef *lcd);
 
 /**
  * The value on the screen for digit 2.
  */
-uint8_t LCD_digitDecode2(LCD_TypeDef *lcd);
+void LCD_digitDecode2(LCD_TypeDef *lcd);
 
 /**
  * The value on the screen for digit 3.
  */
-uint8_t LCD_digitDecode3(LCD_TypeDef *lcd);
+void LCD_digitDecode3(LCD_TypeDef *lcd);
 
 uint8_t LCD_read(LCD_TypeDef *lcd);
 

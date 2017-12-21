@@ -24,6 +24,22 @@ uint8_t LCD_getPinValues(void) {
   // Of the GPIOA register, of interest are pins 1-7 & 10
   // so of the 32bit registry: xxxx xxxx xxxx xxxx xxxx x1xx 1111 111x
 
+  /*
+
+  PA1 = lcd pin 5
+  PA2 = lcd pin 6
+  PA3 = lcd pin 7
+  PA4 = lcd pin 8
+  PA5 = lcd pin 9
+  PA6 = lcd pin 10
+  PA7 = lcd pin 11
+  PA10 = lcd pin 12
+
+  Bit values of the return are:
+  PA10 PA7 PA6 PA5   PA4 PA3 PA2 PA1
+
+  */
+
   uint32_t port = GPIOA->IDR;
   // pins 1-7 & pin 10
   uint8_t pins = 0;
@@ -44,8 +60,16 @@ uint8_t LCD_getPinValues(void) {
 uint8_t LCD_frameStart(void) {
   uint8_t start = 0;
 
+  // Logic high is not good enough as the com has 4 levels.
   HAL_ADC_PollForConversion(&hadc, 100);
   uint32_t com = HAL_ADC_GetValue(&hadc);
+//  char tx_buffer[255];
+//        sprintf(tx_buffer,
+//        "com:%d\n",
+//        com
+//      );
+//  HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+
   if (com > LCD_COM_HIGH) {
     // Wait for overshoot to settle.
     HAL_Delay(2);
@@ -98,31 +122,38 @@ uint8_t LCD_segmentsAsNumber(uint8_t segs) {
  */
 uint8_t LCD_getSegmentsForDigit(LCD_TypeDef *lcd, uint8_t pin1, uint8_t pin2) {
 
+  /*
+   * Only 8 of the original lcd pins are used,
+   * starting at pin 5
+   */
+  uint8_t bit1 = pin1 - 5;
+  uint8_t bit2 = pin2 - 5;
+
   uint8_t segs = 0;
   // Place the value for the pins as segments.
   // A, B, C, D, E, F, G
   // 0, 1, 2, 3, 4, 5, 6  = bit numbers for the segments.
   // dots colons etc are ignored
 
-  // COM0:pin1 = A
-  bitWrite(segs, 0, bitRead(lcd->pins_com0, pin1));
-  // COM0:pin2 = F
-  bitWrite(segs, 5, bitRead(lcd->pins_com0, pin2));
+  // COM0:bit1 = A
+  bitWrite(segs, 0, bitRead(lcd->pins_com0, bit1));
+  // COM0:bit2 = F
+  bitWrite(segs, 5, bitRead(lcd->pins_com0, bit2));
 
-  // COM1:pin1 = B
-  bitWrite(segs, 1, bitRead(lcd->pins_com1, pin1));
-  // COM1:pin2 = G
-  bitWrite(segs, 6, bitRead(lcd->pins_com1, pin2));
+  // COM1:bit1 = B
+  bitWrite(segs, 1, bitRead(lcd->pins_com1, bit1));
+  // COM1:bit2 = G
+  bitWrite(segs, 6, bitRead(lcd->pins_com1, bit2));
 
-  // COM2:pin1 = C
-  bitWrite(segs, 2, bitRead(lcd->pins_com2, pin1));
-  // COM2:pin2 = E
-  bitWrite(segs, 4, bitRead(lcd->pins_com2, pin2));
+  // COM2:bit1 = C
+  bitWrite(segs, 2, bitRead(lcd->pins_com2, bit1));
+  // COM2:bit2 = E
+  bitWrite(segs, 4, bitRead(lcd->pins_com2, bit2));
 
   // COM3:5 = St
   // ignore
-  // COM3:pin2 = D
-  bitWrite(segs, 3, bitRead(lcd->pins_com3, pin2));
+  // COM3:bit2 = D
+  bitWrite(segs, 3, bitRead(lcd->pins_com3, bit2));
 
   return segs;
 }
@@ -139,28 +170,28 @@ void LCD_digitDecode0(LCD_TypeDef *lcd) {
 /**
  * The value on the screen for digit one.
  */
-uint8_t LCD_digitDecode1(LCD_TypeDef *lcd) {
+void LCD_digitDecode1(LCD_TypeDef *lcd) {
   // Digit zero is pins 7 & 8.
   uint8_t segs = LCD_getSegmentsForDigit(lcd, 7, 8);
-  return LCD_segmentsAsNumber(segs);
+  lcd->digit1 = LCD_segmentsAsNumber(segs);
 }
 
 /**
  * The value on the screen for digit 2.
  */
-uint8_t LCD_digitDecode2(LCD_TypeDef *lcd) {
+void LCD_digitDecode2(LCD_TypeDef *lcd) {
   // Digit zero is pins 9 & 10.
   uint8_t segs = LCD_getSegmentsForDigit(lcd, 9, 10);
-  return LCD_segmentsAsNumber(segs);
+  lcd->digit2 = LCD_segmentsAsNumber(segs);
 }
 
 /**
  * The value on the screen for digit 3.
  */
-uint8_t LCD_digitDecode3(LCD_TypeDef *lcd) {
+void LCD_digitDecode3(LCD_TypeDef *lcd) {
   // Digit zero is pins 11 & 12.
   uint8_t segs = LCD_getSegmentsForDigit(lcd, 11, 12);
-  return LCD_segmentsAsNumber(segs);
+  lcd->digit3 = LCD_segmentsAsNumber(segs);
 }
 
 void LCD_decodeDigits(LCD_TypeDef *lcd) {
@@ -245,4 +276,3 @@ uint8_t LCD_pollForWeight(LCD_TypeDef *lcd) {
 
   return valid;
 }
-

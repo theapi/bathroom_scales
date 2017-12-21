@@ -92,4 +92,3 @@ TXState_TypeDef TX_StateComplete(TXState_TypeDef state) {
   /* Nothing left to do. */
   return state;
 }
-
