@@ -13,7 +13,7 @@ extern "C" {
 /**
  * The analog reading that indicates active on the com line.
  */
-#define LCD_COM_HIGH 1000
+#define LCD_COM_HIGH 800
 /**
  * How long before the next com is ready for reading.
  */

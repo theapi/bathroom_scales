@@ -149,34 +149,12 @@ int main(void)
 
       LCD_decodeDigits(&lcd);
 
-      char pins_com0_str[33];
-      itoa (lcd.pins_com0, pins_com0_str, 2);
-
-      char pins_com1_str[33];
-      itoa (lcd.pins_com1, pins_com1_str, 2);
-
-      char pins_com2_str[33];
-      itoa (lcd.pins_com2, pins_com2_str, 2);
-
-      char pins_com3_str[33];
-      itoa (lcd.pins_com3, pins_com3_str, 2);
-
       sprintf(tx_buffer,
-        "id:%d, digit3: %d, digit2: %d, digit1: %d, digit0: %d \ncom0: %s, com1: %s, com2: %s, com3: %s\n",
+        "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \n",
         ++count,
-        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0,
-        pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
+        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0
       );
 
-      HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
-      HAL_Delay(2000);
-
-    }
-
-//    if (LCD_frameStart() == 1) {
-//
-//      LCD_read(&lcd);
-//
 //      char pins_com0_str[33];
 //      itoa (lcd.pins_com0, pins_com0_str, 2);
 //
@@ -190,14 +168,16 @@ int main(void)
 //      itoa (lcd.pins_com3, pins_com3_str, 2);
 //
 //      sprintf(tx_buffer,
-//          "id:%d, com0: %s, com1: %s, com2: %s, com3: %s\n",
-//          ++count,
-//          pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
-//       );
-//
-//      HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
-//      HAL_Delay(2000);
-//    }
+//        "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \ncom0: %s, com1: %s, com2: %s, com3: %s\n",
+//        ++count,
+//        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0,
+//        pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
+//      );
+
+      HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+      HAL_Delay(250);
+
+    }
 
 
 //    uint8_t pin_values = LCD_getPinValues();
@@ -205,10 +185,7 @@ int main(void)
 //    itoa (pin_values, pin_values_str, 2);
 //    sprintf(tx_buffer, "id:%d, pins: %s, hex: %X\n", ++count, pin_values_str, pin_values);
 //    HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
-
-
-
-    //HAL_Delay(2000);
+//    HAL_Delay(2000);
 
   }
   /* USER CODE END 3 */

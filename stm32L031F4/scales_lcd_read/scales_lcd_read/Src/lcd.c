@@ -63,6 +63,12 @@ uint8_t LCD_frameStart(void) {
   // Logic high is not good enough as the com has 4 levels.
   HAL_ADC_PollForConversion(&hadc, 100);
   uint32_t com = HAL_ADC_GetValue(&hadc);
+//  char tx_buffer[255];
+//        sprintf(tx_buffer,
+//        "com:%d\n",
+//        com
+//      );
+//  HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
 
   if (com > LCD_COM_HIGH) {
     // Wait for overshoot to settle.
