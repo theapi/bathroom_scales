@@ -247,7 +247,20 @@ uint8_t LCD_pollForWeight(LCD_TypeDef *lcd) {
 
       // The ones digit has a value.
       if (lcd->digit1 != 11) {
-        lcd->weight = (lcd->digit3 * 1000) + (lcd->digit2 * 100) + (lcd->digit1 * 10) + lcd->digit0;
+        /* Record the weight reading */
+        lcd->weight = 0;
+
+        /*
+         * digit3 & digit2 could be blank (11).
+         */
+        if (lcd->digit3 != 11) {
+          lcd->weight += lcd->digit3 * 1000;
+        }
+        if (lcd->digit2 != 11) {
+          lcd->weight += lcd->digit2 * 100;
+        }
+
+        lcd->weight += (lcd->digit1 * 10) + lcd->digit0;
 
         if (lcd->last_weight == lcd->weight) {
           lcd->same_count++;

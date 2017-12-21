@@ -145,39 +145,50 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-    if (LCD_read(&lcd)) {
-
-      LCD_decodeDigits(&lcd);
-
+    if (LCD_pollForWeight(&lcd)) {
       sprintf(tx_buffer,
-        "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \n",
+        "id:%d, weight: %d \n",
         ++count,
-        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0
+        lcd.weight
       );
-
-//      char pins_com0_str[33];
-//      itoa (lcd.pins_com0, pins_com0_str, 2);
-//
-//      char pins_com1_str[33];
-//      itoa (lcd.pins_com1, pins_com1_str, 2);
-//
-//      char pins_com2_str[33];
-//      itoa (lcd.pins_com2, pins_com2_str, 2);
-//
-//      char pins_com3_str[33];
-//      itoa (lcd.pins_com3, pins_com3_str, 2);
-//
-//      sprintf(tx_buffer,
-//        "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \ncom0: %s, com1: %s, com2: %s, com3: %s\n",
-//        ++count,
-//        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0,
-//        pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
-//      );
-
       HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
-      HAL_Delay(250);
-
     }
+
+//    if (LCD_read(&lcd)) {
+//
+//      LCD_decodeDigits(&lcd);
+//
+//      if (lcd.digit1 != 11) {
+//
+//        sprintf(tx_buffer,
+//          "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \n",
+//          ++count,
+//          lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0
+//        );
+//
+//  //      char pins_com0_str[33];
+//  //      itoa (lcd.pins_com0, pins_com0_str, 2);
+//  //
+//  //      char pins_com1_str[33];
+//  //      itoa (lcd.pins_com1, pins_com1_str, 2);
+//  //
+//  //      char pins_com2_str[33];
+//  //      itoa (lcd.pins_com2, pins_com2_str, 2);
+//  //
+//  //      char pins_com3_str[33];
+//  //      itoa (lcd.pins_com3, pins_com3_str, 2);
+//  //
+//  //      sprintf(tx_buffer,
+//  //        "id:%d, d3: %d, d2: %d, d1: %d, d0: %d \ncom0: %s, com1: %s, com2: %s, com3: %s\n",
+//  //        ++count,
+//  //        lcd.digit3, lcd.digit2, lcd.digit1, lcd.digit0,
+//  //        pins_com0_str, pins_com1_str, pins_com2_str, pins_com3_str
+//  //      );
+//
+//        HAL_UART_Transmit(&huart2, (uint8_t*) tx_buffer, strlen(tx_buffer), 1000);
+//        HAL_Delay(250);
+//      }
+//    }
 
 
 //    uint8_t pin_values = LCD_getPinValues();

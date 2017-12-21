@@ -21,11 +21,11 @@ extern "C" {
 /**
  * How long to wait between lcd reads.
  */
-#define LCD_READ_INTERVAL 250
+#define LCD_READ_INTERVAL 50
 /**
  * How many times the reading is the same to qualify as the steady weight.
  */
-#define LCD_SAME_COUNT 32
+#define LCD_SAME_COUNT 1
 
 /**
  * @brief Scales_TypeDef
